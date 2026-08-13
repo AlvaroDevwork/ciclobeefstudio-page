@@ -34,8 +34,8 @@ CicloBeef Studio currently operates through a curated quotation workflow rather 
 
 The Gallery presents the eight Collection 001 visual variants while grouping them under two public artwork titles:
 
-- Aureocrya — CicloBeef Signature Frame and CicloBeef Signature Acrylic, vertical and horizontal.
-- Vesperocrya — CicloBeef Signature Frame and CicloBeef Signature Acrylic, vertical and horizontal.
+- Aereocrya Dreams — CicloBeef Signature Frame and CicloBeef Signature Acrylic, vertical and horizontal.
+- Vesperocrya Dreams — CicloBeef Signature Frame and CicloBeef Signature Acrylic, vertical and horizontal.
 
 Tablet and iPad Gallery controls are expected to remain visible and usable across the 768px to 1024px viewport range.
 
