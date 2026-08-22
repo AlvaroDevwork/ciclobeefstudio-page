@@ -361,6 +361,79 @@ function initProductBrowsers() {
     });
 }
 
+function initSectionNavigation() {
+    const sectionNav = document.querySelector(".section-nav");
+
+    if (!sectionNav) {
+        return;
+    }
+
+    const links = Array.from(sectionNav.querySelectorAll(".section-nav__link"));
+    const destinations = links
+        .map(link => {
+            const hash = link.getAttribute("href");
+            const target = hash ? document.querySelector(hash) : null;
+            return target ? { hash, link, target } : null;
+        })
+        .filter(Boolean);
+
+    if (!destinations.length) {
+        return;
+    }
+
+    function setActiveDestination(activeHash) {
+        const isVisible = activeHash !== "#hero";
+
+        sectionNav.classList.toggle("is-visible", isVisible);
+        sectionNav.toggleAttribute("inert", !isVisible);
+
+        destinations.forEach(({ hash, link }) => {
+            if (hash === activeHash) {
+                link.setAttribute("aria-current", "location");
+            } else {
+                link.removeAttribute("aria-current");
+            }
+        });
+    }
+
+    function updateActiveDestination() {
+        const activationLine = window.scrollY + (window.innerHeight * 0.08);
+        let activeDestination = destinations[0];
+
+        destinations.forEach(destination => {
+            const targetTop = destination.target.getBoundingClientRect().top + window.scrollY;
+
+            if (targetTop <= activationLine && targetTop >= (activeDestination.target.getBoundingClientRect().top + window.scrollY)) {
+                activeDestination = destination;
+            }
+        });
+
+        setActiveDestination(activeDestination.hash);
+    }
+
+    links.forEach(link => {
+        link.addEventListener("click", () => {
+            const hash = link.getAttribute("href");
+
+            if (hash) {
+                setActiveDestination(hash);
+            }
+        });
+    });
+
+    if ("IntersectionObserver" in window) {
+        const observer = new IntersectionObserver(updateActiveDestination, {
+            rootMargin: "-8% 0px -91% 0px",
+            threshold: [0, 0.01],
+        });
+
+        destinations.forEach(({ target }) => observer.observe(target));
+    }
+
+    window.addEventListener("hashchange", () => window.requestAnimationFrame(updateActiveDestination));
+    updateActiveDestination();
+}
+
 if (scrollBtn) {
     scrollBtn.addEventListener("click", () => {
         scrollToSection(document.getElementById("gallery"));
@@ -405,3 +478,4 @@ initGallery();
 initHeroArtworkReflection();
 initCol001ScrollReveal();
 initProductBrowsers();
+initSectionNavigation();
