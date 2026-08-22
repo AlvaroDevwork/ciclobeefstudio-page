@@ -2517,6 +2517,64 @@ footer a:hover {
     }
 }
 
+@media (min-width: 981px) and (max-width: 1024px) {
+    .panel-hero .landing-nav {
+        left: 1.25rem;
+        right: 1.25rem;
+        min-height: 4.25rem;
+        background: rgba(28, 28, 28, 0.68);
+    }
+
+    .panel-hero .nav-logo-img {
+        width: 160px;
+        max-width: 40vw;
+        filter: saturate(1.24) contrast(1.12) drop-shadow(0 0 12px rgba(255, 195, 0, 0.24));
+    }
+
+    .panel-hero .nav-toggle {
+        display: block;
+        width: 2.35rem;
+        height: 2.35rem;
+        padding: 0.58rem;
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(10px);
+    }
+
+    .panel-hero .nav-links {
+        position: absolute;
+        top: calc(100% + 0.6rem);
+        right: 0;
+        width: min(56vw, 18rem);
+        display: none;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        padding: 0.45rem;
+        border: 1px solid rgba(255, 195, 0, 0.2);
+        border-radius: 8px;
+        background: rgba(34, 34, 34, 0.86);
+        backdrop-filter: blur(16px);
+        box-shadow: 0 18px 36px rgba(0, 0, 0, 0.36);
+        max-height: min(74svh, 28rem);
+        overflow-y: auto;
+    }
+
+    .panel-hero .nav-links.show {
+        display: flex;
+    }
+
+    .panel-hero .nav-links a {
+        display: block;
+        min-height: 44px;
+        padding: 0.9rem 1rem;
+        border-radius: 4px;
+    }
+
+    .panel-hero .nav-links a:hover {
+        background: rgba(255, 195, 0, 0.08);
+    }
+}
+
 @media (max-width: 1024px) {
     .hero,
     .landing-panel {
