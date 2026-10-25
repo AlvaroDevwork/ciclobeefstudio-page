@@ -32,8 +32,31 @@ async function contextMedia(modal) {
 }
 
 async function expectSinglePublicCta(card) {
-    await expect(card.locator('[data-signature-material][data-shopify-mount-state="mounted"]'))
-        .toHaveCount(2, { timeout: 40_000 });
+    await expect.poll(async () => card.evaluate(node => {
+        const mounts = [...node.querySelectorAll("[data-signature-material]")];
+        const artwork = mounts[0]?.dataset.signatureArtwork;
+        const coordinator = window.CBSCommerce.getDiagnostics().signatureCoordinators
+            .find(context => context.artwork === artwork);
+        const readyMounts = mounts.filter(mount => {
+            const frame = mount.querySelector("iframe");
+            return mount.dataset.shopifyMountState === "mounted"
+                && Boolean(frame?.contentDocument)
+                && Boolean(frame.contentDocument.querySelector("button"));
+        });
+
+        return {
+            mountCount: mounts.length,
+            readyMountCount: readyMounts.length,
+            coordinatorComponentCount: coordinator?.componentCount ?? 0,
+        };
+    }), {
+        message: "both Signature materials are mounted, rendered, and registered",
+        timeout: 40_000,
+    }).toEqual({
+        mountCount: 2,
+        readyMountCount: 2,
+        coordinatorComponentCount: 2,
+    });
     const result = await card.evaluate(node => {
         const states = [...node.querySelectorAll("[data-signature-material]")].map(mount => {
             const frame = mount.querySelector("iframe");

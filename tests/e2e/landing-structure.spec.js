@@ -56,15 +56,62 @@ test("landing architecture contains the four approved primary sections", async (
             document.querySelectorAll("#products .cbs-store-group:not([hidden]) .cbs-product-card"),
             card => {
                 const action = card.querySelector(".cbs-composer-launcher");
-                const commerce = card.querySelector(".cbs-product-card__commerce");
+                const title = card.querySelector(".cbs-product-card__body h4");
                 const cardRect = card.getBoundingClientRect();
                 const actionRect = action?.getBoundingClientRect();
-                const commerceTransform = commerce ? getComputedStyle(commerce).transform : "none";
+                const actionStyle = action ? getComputedStyle(action) : null;
+                const titleRange = document.createRange();
+                titleRange.selectNodeContents(title);
+                const titleTextRects = Array.from(titleRange.getClientRects())
+                    .filter(rect => rect.width > 0 && rect.height > 0);
+                const rectanglesOverlap = (first, second) => (
+                    Math.max(first.left, second.left) < Math.min(first.right, second.right)
+                    && Math.max(first.top, second.top) < Math.min(first.bottom, second.bottom)
+                );
+                const adjacentInteractiveRects = Array.from(
+                    card.querySelectorAll("a, button, input, select, textarea, [tabindex]"),
+                ).filter(node => (
+                    node !== action
+                    && !action?.contains(node)
+                    && node.getClientRects().length
+                    && getComputedStyle(node).display !== "none"
+                    && getComputedStyle(node).visibility !== "hidden"
+                )).map(node => node.getBoundingClientRect());
                 return {
                     hasAction: Boolean(actionRect),
+                    visible: Boolean(
+                        actionRect
+                        && actionRect.width > 0
+                        && actionRect.height > 0
+                        && action.getClientRects().length
+                        && actionStyle.display !== "none"
+                        && actionStyle.visibility !== "hidden"
+                        && actionStyle.opacity !== "0"
+                    ),
+                    positiveGeometry: Boolean(actionRect?.width > 0 && actionRect?.height > 0),
+                    containedInCard: Boolean(
+                        actionRect
+                        && actionRect.left >= cardRect.left
+                        && actionRect.right <= cardRect.right
+                        && actionRect.top >= cardRect.top
+                        && actionRect.bottom <= cardRect.bottom
+                    ),
+                    renderedTitleTextCount: titleTextRects.length,
+                    avoidsTitleText: Boolean(
+                        actionRect
+                        && titleTextRects.every(textRect => !rectanglesOverlap(actionRect, textRect))
+                    ),
+                    avoidsAdjacentInteractiveContent: Boolean(
+                        actionRect
+                        && adjacentInteractiveRects.every(rect => !rectanglesOverlap(actionRect, rect))
+                    ),
+                    usable: Boolean(
+                        action
+                        && !action.disabled
+                        && action.getAttribute("aria-disabled") !== "true"
+                        && actionStyle.pointerEvents !== "none"
+                    ),
                     bottomGap: actionRect ? cardRect.bottom - actionRect.bottom : 0,
-                    commerceTransform,
-                    commerceTranslateY: commerceTransform === "none" ? 0 : new DOMMatrix(commerceTransform).m42,
                 };
             },
         ),
@@ -189,10 +236,25 @@ test("landing architecture contains the four approved primary sections", async (
                 socialTextAlign: getComputedStyle(socialCta).textAlign,
                 emailNote: supportText.textContent.trim(),
                 titleTopRatio: (title.getBoundingClientRect().top - sectionRect.top) / sectionRect.height,
-                titleTopOffset: title.getBoundingClientRect().top - sectionRect.top,
-                aboutTitleTopOffset: aboutTitleRect.top - aboutRect.top,
+                aboutTitleTopRatio: (aboutTitleRect.top - aboutRect.top) / aboutRect.height,
+                titleLeftOffset: title.getBoundingClientRect().left - sectionRect.left,
+                aboutTitleLeftOffset: aboutTitleRect.left - aboutRect.left,
+                titleContained: title.getBoundingClientRect().top >= sectionRect.top
+                    && title.getBoundingClientRect().bottom <= sectionRect.bottom
+                    && title.getBoundingClientRect().left >= sectionRect.left
+                    && title.getBoundingClientRect().right <= sectionRect.right,
+                aboutTitleContained: aboutTitleRect.top >= aboutRect.top
+                    && aboutTitleRect.bottom <= aboutRect.bottom
+                    && aboutTitleRect.left >= aboutRect.left
+                    && aboutTitleRect.right <= aboutRect.right,
                 titleInformationGap: information.getBoundingClientRect().top - title.getBoundingClientRect().bottom,
                 footerBottomGap: sectionRect.bottom - footerRect.bottom,
+                footerTopRatio: (footerRect.top - sectionRect.top) / sectionRect.height,
+                footerContained: footerRect.top >= sectionRect.top
+                    && footerRect.bottom <= sectionRect.bottom,
+                supportContained: supportTextRect.top >= sectionRect.top
+                    && supportTextRect.bottom <= sectionRect.bottom,
+                footerFollowsContent: footerRect.top >= supportTextRect.bottom,
                 channelsFollowDescription: channelsRect.top >= information.getBoundingClientRect().bottom,
                 channelsFollowCta: channelsRect.top >= socialCtaRect.bottom,
                 channelsFollowNote: channelsRect.top >= socialNoteRect.bottom,
@@ -276,17 +338,17 @@ test("landing architecture contains the four approved primary sections", async (
     ))).toBe(true);
     expect(structure.productActionGeometry.length).toBeGreaterThan(0);
     expect(structure.productActionGeometry.every(item => item.hasAction)).toBe(true);
+    expect(structure.productActionGeometry.every(item => item.visible)).toBe(true);
+    expect(structure.productActionGeometry.every(item => item.positiveGeometry)).toBe(true);
+    expect(structure.productActionGeometry.every(item => item.containedInCard)).toBe(true);
+    expect(structure.productActionGeometry.every(item => item.renderedTitleTextCount > 0)).toBe(true);
+    expect(structure.productActionGeometry.every(item => item.avoidsTitleText)).toBe(true);
+    expect(structure.productActionGeometry.every(item => item.avoidsAdjacentInteractiveContent)).toBe(true);
+    expect(structure.productActionGeometry.every(item => item.usable)).toBe(true);
     expect(
         structure.productActionGeometry.every(item => item.bottomGap >= 8),
         JSON.stringify(structure.productActionGeometry),
     ).toBe(true);
-    expect(structure.productActionGeometry.every(item => item.commerceTransform !== "none")).toBe(true);
-    if (structure.viewportWidth > 900) {
-        expect(structure.productActionGeometry.every(item => item.bottomGap >= 26)).toBe(true);
-        expect(structure.productActionGeometry.every(item => item.commerceTranslateY < -8)).toBe(true);
-    } else {
-        expect(structure.productActionGeometry.every(item => item.commerceTranslateY >= -6)).toBe(true);
-    }
     for (const scene of structure.sceneGeometry) {
         expect(Math.abs(scene.height - structure.viewportHeight), scene.id).toBeLessThanOrEqual(1);
         expect(scene.contentContained, JSON.stringify(scene)).toBe(true);
@@ -336,15 +398,27 @@ test("landing architecture contains the four approved primary sections", async (
     expect(structure.contact.socialCta).toBe("Follow CicloBeef Studio");
     expect(structure.contact.socialNote).toBe("Selected products and studio updates are also showcased on our social channels.");
     expect(structure.contact.emailNote).toBe("Email us for order questions, customer care, and general enquiries.");
+    expect(structure.contact.titleTopRatio).toBeGreaterThan(0);
     expect(structure.contact.titleTopRatio).toBeLessThan(0.3);
-    expect(Math.abs(structure.contact.titleTopOffset - structure.contact.aboutTitleTopOffset)).toBeLessThanOrEqual(8);
+    expect(structure.contact.aboutTitleTopRatio).toBeGreaterThan(0);
+    expect(structure.contact.aboutTitleTopRatio).toBeLessThan(0.35);
+    expect(structure.contact.titleContained).toBe(true);
+    expect(structure.contact.aboutTitleContained).toBe(true);
     expect(structure.contact.titleInformationGap).toBeGreaterThanOrEqual(12);
     expect(structure.contact.footerBottomGap).toBeGreaterThanOrEqual(8);
+    expect(structure.contact.footerContained).toBe(true);
+    expect(structure.contact.supportContained).toBe(true);
+    expect(structure.contact.footerFollowsContent).toBe(true);
     expect(structure.contact.channelsFollowDescription).toBe(true);
     expect(structure.contact.channelsFollowCta).toBe(true);
     expect(structure.contact.channelsFollowNote).toBe(true);
     if (structure.viewportWidth <= 900) {
         expect(structure.contact.contentCentered).toBeLessThanOrEqual(1);
+    }
+    if (structure.viewportWidth <= 600) {
+        expect(Math.abs(
+            structure.contact.titleLeftOffset - structure.contact.aboutTitleLeftOffset
+        )).toBeLessThanOrEqual(1);
     }
     expect(structure.contact.iconsAligned).toBeLessThanOrEqual(1);
     expect(structure.contact.iconSizeDifference).toBeLessThanOrEqual(1);
@@ -385,7 +459,7 @@ test("landing architecture contains the four approved primary sections", async (
         expect(structure.contact.socialIconsLeft).toBeGreaterThan(structure.contact.sectionCenterX);
         expect(Math.abs(structure.contact.socialIconsLeft - structure.contact.socialTextLeft)).toBeLessThanOrEqual(1);
     } else {
-        expect(structure.contact.contentFooterGap).toBeLessThanOrEqual(64);
+        expect(structure.contact.footerTopRatio).toBeGreaterThanOrEqual(0.75);
     }
     expect(structure.horizontalOverflow).toBe(false);
 

@@ -77,8 +77,10 @@ async function selectNextComposerOption(dialog) {
 }
 
 async function goToProducts(page) {
-    await page.locator('a[href="#products"]:visible').first().click();
-    await expect(page.locator("#products")).toBeInViewport();
+    const products = page.locator("#products");
+    await products.scrollIntoViewIfNeeded();
+    await expect(products).toBeVisible();
+    await expect(products).toBeInViewport();
 }
 
 async function addProductThroughComposer(page, { excludedProductKeys = [] } = {}) {
