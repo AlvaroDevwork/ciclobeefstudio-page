@@ -11,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="shopify.css" />
+    <link rel="preload" as="image" href="assets/images/hero/CBS-HERO-U01-CROSS-TREE-GLOW.png" />
     <script defer src="assets/js/vendor/gsap.min.js"></script>
     <script defer src="assets/js/vendor/ScrollTrigger.min.js"></script>
     <script defer src="script.js"></script>
@@ -43,11 +44,7 @@
 
         <ul class="nav-links" id="navLinks">
             <li><a href="#products">Studio Store</a></li>
-            <li><a href="#gallery">Gallery</a></li>
-            <li><a href="#formats">Formats</a></li>
-            <li><a href="#process">Process</a></li>
-            <li><a href="#quote">Custom Orders</a></li>
-            <li><a href="#about">About</a></li>
+            <li><a href="#about">About &amp; FAQ</a></li>
             <li><a href="#contact">Contact</a></li>
         </ul>
     </nav>
@@ -57,24 +54,33 @@
 
         <div class="overlay panel-inner">
             <div class="hero-copy">
-                <h1>Premium Wall Art That Speaks</h1>
-                <p>High-end cultural prints for collectors, offices, and spaces that demand more than decoration.</p>
+                <h1>Refined Art for Modern Spaces</h1>
+                <p>Curated objects with character.</p>
                 <div class="hero-actions">
-                    <button id="scrollBtn">Explore Studio Store</button>
+                    <button id="scrollBtn">Explore the Collection</button>
                 </div>
             </div>
-            <div class="hero-visual-slot" aria-label="Featured CicloBeef framed artworks">
-                <figure class="hero-artwork-stage">
-                    <span class="hero-artwork-shadow" aria-hidden="true"></span>
-                    <span class="hero-artwork-reflection" aria-hidden="true"></span>
+            <div class="hero-visual-slot">
+                <figure class="hero-tree-stage" data-hero-tree>
+                    <span class="hero-tree-glow" aria-hidden="true"></span>
                     <img
-                        src="assets/images/HeroAtworks.png"
-                        alt="Two premium Studio Black framed artworks presented in perspective"
-                        class="hero-artwork-img"
-                        width="1440"
-                        height="1080"
+                        src="assets/images/hero/hero-holiday-cross-tree-off.png"
+                        alt="Holiday Cross Tree decorated with greenery and white draping"
+                        class="hero-tree-image hero-tree-image-off"
+                        width="1240"
+                        height="1269"
                         fetchpriority="high"
                         decoding="async"
+                    />
+                    <img
+                        src="assets/images/hero/CBS-HERO-U01-CROSS-TREE-GLOW.png"
+                        alt=""
+                        class="hero-tree-image hero-tree-image-on"
+                        width="1254"
+                        height="1254"
+                        loading="eager"
+                        decoding="async"
+                        aria-hidden="true"
                     />
                 </figure>
             </div>
@@ -95,361 +101,73 @@
             </div>
         </section>
 
-        <section class="section landing-panel section-light panel-compact" id="gallery">
-            <div class="section-inner panel-inner">
-                <div class="section-header col001-section-header">
-                    <h2 class="section-title">Featured Works</h2>
-                    <p class="section-kicker">The complete COL001 release across artwork, material, and orientation.</p>
-                </div>
-                <div class="gallery-slider col001-gallery" data-gallery-slider aria-roledescription="carousel" aria-label="COL001 complete studio edition gallery">
-                    <div class="gallery-track col001-gallery-grid" data-gallery-track>
-                        <article class="gallery-card col001-gallery-card is-portrait" data-gallery-item data-artwork="aw001" data-material="pwfp" data-orientation="portrait" aria-roledescription="slide" aria-label="1 of 8">
-                            <figure>
-                                <img src="assets/images/col001/gallery/col001-aw001-pwfp-black-vertical-525.webp" srcset="assets/images/col001/gallery/col001-aw001-pwfp-black-vertical-525.webp 525w, assets/images/col001/gallery/col001-aw001-pwfp-black-vertical-1050.webp 1050w" sizes="(max-width: 560px) 88vw, (max-width: 1024px) 72vw, 440px" alt="Aereocrya Dreams — CicloBeef Signature Frame in vertical orientation" width="525" height="750" loading="lazy" decoding="async" />
-                                <figcaption><strong>Aereocrya Dreams</strong><span>CicloBeef Signature Frame</span><em>Vertical</em></figcaption>
-                            </figure>
-                        </article>
-                        <article class="gallery-card col001-gallery-card is-landscape" data-gallery-item data-artwork="aw001" data-material="pwfp" data-orientation="landscape" aria-roledescription="slide" aria-label="2 of 8">
-                            <figure>
-                                <img src="assets/images/col001/gallery/col001-aw001-pwfp-black-horizontal-750.webp" srcset="assets/images/col001/gallery/col001-aw001-pwfp-black-horizontal-750.webp 750w, assets/images/col001/gallery/col001-aw001-pwfp-black-horizontal-1500.webp 1500w" sizes="(max-width: 560px) 91vw, (max-width: 1024px) 76vw, 860px" alt="Aereocrya Dreams — CicloBeef Signature Frame in horizontal orientation" width="750" height="525" loading="lazy" decoding="async" />
-                                <figcaption><strong>Aereocrya Dreams</strong><span>CicloBeef Signature Frame</span><em>Horizontal</em></figcaption>
-                            </figure>
-                        </article>
-                        <article class="gallery-card col001-gallery-card is-portrait" data-gallery-item data-artwork="aw001" data-material="acrylic" data-orientation="portrait" aria-roledescription="slide" aria-label="3 of 8">
-                            <figure>
-                                <img src="assets/images/col001/gallery/col001-aw001-acrylic-vertical-525.webp" srcset="assets/images/col001/gallery/col001-aw001-acrylic-vertical-525.webp 525w, assets/images/col001/gallery/col001-aw001-acrylic-vertical-1050.webp 1050w" sizes="(max-width: 560px) 88vw, (max-width: 1024px) 72vw, 440px" alt="Aereocrya Dreams — CicloBeef Signature Acrylic in vertical orientation" width="525" height="750" loading="lazy" decoding="async" />
-                                <figcaption><strong>Aereocrya Dreams</strong><span>CicloBeef Signature Acrylic</span><em>Vertical</em></figcaption>
-                            </figure>
-                        </article>
-                        <article class="gallery-card col001-gallery-card is-landscape" data-gallery-item data-artwork="aw001" data-material="acrylic" data-orientation="landscape" aria-roledescription="slide" aria-label="4 of 8">
-                            <figure>
-                                <img src="assets/images/col001/gallery/col001-aw001-acrylic-horizontal-750.webp" srcset="assets/images/col001/gallery/col001-aw001-acrylic-horizontal-750.webp 750w, assets/images/col001/gallery/col001-aw001-acrylic-horizontal-1500.webp 1500w" sizes="(max-width: 560px) 91vw, (max-width: 1024px) 76vw, 860px" alt="Aereocrya Dreams — CicloBeef Signature Acrylic in horizontal orientation" width="750" height="525" loading="lazy" decoding="async" />
-                                <figcaption><strong>Aereocrya Dreams</strong><span>CicloBeef Signature Acrylic</span><em>Horizontal</em></figcaption>
-                            </figure>
-                        </article>
-                        <article class="gallery-card col001-gallery-card is-portrait" data-gallery-item data-artwork="aw002" data-material="pwfp" data-orientation="portrait" aria-roledescription="slide" aria-label="5 of 8">
-                            <figure>
-                                <img src="assets/images/col001/gallery/col001-aw002-pwfp-black-vertical-525.webp" srcset="assets/images/col001/gallery/col001-aw002-pwfp-black-vertical-525.webp 525w, assets/images/col001/gallery/col001-aw002-pwfp-black-vertical-1050.webp 1050w" sizes="(max-width: 560px) 88vw, (max-width: 1024px) 72vw, 440px" alt="Vesperocrya Dreams — CicloBeef Signature Frame in vertical orientation" width="525" height="750" loading="lazy" decoding="async" />
-                                <figcaption><strong>Vesperocrya Dreams</strong><span>CicloBeef Signature Frame</span><em>Vertical</em></figcaption>
-                            </figure>
-                        </article>
-                        <article class="gallery-card col001-gallery-card is-landscape" data-gallery-item data-artwork="aw002" data-material="pwfp" data-orientation="landscape" aria-roledescription="slide" aria-label="6 of 8">
-                            <figure>
-                                <img src="assets/images/col001/gallery/col001-aw002-pwfp-black-horizontal-750.webp" srcset="assets/images/col001/gallery/col001-aw002-pwfp-black-horizontal-750.webp 750w, assets/images/col001/gallery/col001-aw002-pwfp-black-horizontal-1500.webp 1500w" sizes="(max-width: 560px) 91vw, (max-width: 1024px) 76vw, 860px" alt="Vesperocrya Dreams — CicloBeef Signature Frame in horizontal orientation" width="750" height="525" loading="lazy" decoding="async" />
-                                <figcaption><strong>Vesperocrya Dreams</strong><span>CicloBeef Signature Frame</span><em>Horizontal</em></figcaption>
-                            </figure>
-                        </article>
-                        <article class="gallery-card col001-gallery-card is-portrait" data-gallery-item data-artwork="aw002" data-material="acrylic" data-orientation="portrait" aria-roledescription="slide" aria-label="7 of 8">
-                            <figure>
-                                <img src="assets/images/col001/gallery/col001-aw002-acrylic-vertical-525.webp" srcset="assets/images/col001/gallery/col001-aw002-acrylic-vertical-525.webp 525w, assets/images/col001/gallery/col001-aw002-acrylic-vertical-1050.webp 1050w" sizes="(max-width: 560px) 88vw, (max-width: 1024px) 72vw, 440px" alt="Vesperocrya Dreams — CicloBeef Signature Acrylic in vertical orientation" width="525" height="750" loading="lazy" decoding="async" />
-                                <figcaption><strong>Vesperocrya Dreams</strong><span>CicloBeef Signature Acrylic</span><em>Vertical</em></figcaption>
-                            </figure>
-                        </article>
-                        <article class="gallery-card col001-gallery-card is-landscape" data-gallery-item data-artwork="aw002" data-material="acrylic" data-orientation="landscape" aria-roledescription="slide" aria-label="8 of 8">
-                            <figure>
-                                <img src="assets/images/col001/gallery/col001-aw002-acrylic-horizontal-750.webp" srcset="assets/images/col001/gallery/col001-aw002-acrylic-horizontal-750.webp 750w, assets/images/col001/gallery/col001-aw002-acrylic-horizontal-1500.webp 1500w" sizes="(max-width: 560px) 91vw, (max-width: 1024px) 76vw, 860px" alt="Vesperocrya Dreams — CicloBeef Signature Acrylic in horizontal orientation" width="750" height="525" loading="lazy" decoding="async" />
-                                <figcaption><strong>Vesperocrya Dreams</strong><span>CicloBeef Signature Acrylic</span><em>Horizontal</em></figcaption>
-                            </figure>
-                        </article>
-                    </div>
-                    <div class="gallery-controls" aria-label="Gallery controls">
-                        <button type="button" class="gallery-control" data-gallery-prev aria-label="Previous gallery item">
-                            <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
-                        </button>
-                        <button type="button" class="gallery-control" data-gallery-next aria-label="Next gallery item">
-                            <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
-                        </button>
+        <section class="section landing-panel section-dark cbs-scene" id="about" aria-labelledby="aboutTitle">
+            <div class="cbs-scene__inner">
+                <div class="cbs-about__overview">
+                    <header class="cbs-scene__heading">
+                        <h2 id="aboutTitle">Why CicloBeef Studio</h2>
+                        <p>Premium cultural wall art for spaces that value memory, symbolism, and visual conversation.</p>
+                    </header>
+                    <div class="cbs-scene__pillars">
+                        <article><h3>Editorial depth</h3><p>Research, cultural memory, and symbolism shape the artwork.</p></article>
+                        <article><h3>Visual direction</h3><p>A refined language for homes, offices, and curated interiors.</p></article>
+                        <article><h3>Cultural presence</h3><p>Meaningful work with a distinct point of view.</p></article>
+                        <article><h3>Conversation pieces</h3><p>Art designed to become a visual statement.</p></article>
                     </div>
                 </div>
-                <aside class="cbs-gallery-shop" aria-label="Shop the featured editions">
-                    <p>Collect COL001 in the signature finish that suits your space.</p>
-                    <div class="cbs-gallery-shop__links">
-                        <a href="#products" data-shopify-link-key="ORIG-01">Shop Signature Frame</a>
-                        <a href="#products" data-shopify-link-key="ORIG-02">Shop Signature Acrylic</a>
+                <aside class="cbs-about__faq" aria-labelledby="faqTitle">
+                    <header class="cbs-about__faq-heading">
+                        <h2 id="faqTitle">FAQ</h2>
+                    </header>
+                    <div class="cbs-about__faq-list">
+                        <details name="cbs-faq" open>
+                            <summary><span>Orders &amp; Payment</span>How do I complete an order?</summary>
+                            <p>Configure your piece in the Studio Store, review the Cart, and continue to secure checkout. Available payment options appear during checkout.</p>
+                        </details>
+                        <details name="cbs-faq">
+                            <summary><span>Shipping &amp; Tracking</span>How will I follow my delivery?</summary>
+                            <p>Order and tracking updates are shared when they become available. Contact the studio if you need help with an active order.</p>
+                        </details>
+                        <details name="cbs-faq">
+                            <summary><span>Editions &amp; Variants</span>How do I choose the right edition?</summary>
+                            <p>Each product interface shows its currently available dimensions, finishes, colors, and other configuration choices.</p>
+                        </details>
+                        <details name="cbs-faq">
+                            <summary><span>Custom &amp; Special Requests</span>Can I request something outside the Studio Store?</summary>
+                            <p>Yes. Contact the studio to discuss a special project. Availability, scope, and next steps are confirmed individually.</p>
+                        </details>
+                        <details name="cbs-faq">
+                            <summary><span>Returns &amp; Support</span>Where can I get help after ordering?</summary>
+                            <p>Contact the studio with your order details. The team will review your request and explain the support options applicable to your order.</p>
+                        </details>
                     </div>
                 </aside>
             </div>
         </section>
 
-        <section class="section landing-panel section-light" id="formats">
-            <div class="section-inner panel-inner">
-                <h2 class="section-title">Signature Art Formats</h2>
-                <div class="format-system" aria-label="Artwork, orientation, size, and material hierarchy">
-                    <div class="format-flow">
-                        <span>Artwork</span>
-                        <span>Orientation</span>
-                        <span>Size</span>
-                        <span>Material</span>
-                    </div>
-                    <div class="format-groups">
-                        <section class="format-orientation-group" aria-labelledby="compactFormatsTitle">
-                            <h3 id="compactFormatsTitle">Compact</h3>
-                            <div class="format-card-list">
-                                <article class="format-card" tabindex="0" aria-label="Format 50 x 70 cm / 20 x 28 inches, Vertical">
-                                    <span class="format-diagram format-diagram-portrait" aria-hidden="true"></span>
-                                    <h4>50 × 70 cm / 20 × 28"</h4>
-                                    <p>Vertical</p>
-                                </article>
-                                <article class="format-card" tabindex="0" aria-label="Format 50 x 70 cm / 20 x 28 inches, Horizontal">
-                                    <span class="format-diagram format-diagram-landscape" aria-hidden="true"></span>
-                                    <h4>50 × 70 cm / 20 × 28"</h4>
-                                    <p>Horizontal</p>
-                                </article>
-                            </div>
-                        </section>
-                        <section class="format-orientation-group" aria-labelledby="mediumFormatsTitle">
-                            <h3 id="mediumFormatsTitle">Medium</h3>
-                            <div class="format-card-list">
-                                <article class="format-card" tabindex="0" aria-label="Format 60 x 90 cm / 24 x 36 inches, Vertical">
-                                    <span class="format-diagram format-diagram-portrait" aria-hidden="true"></span>
-                                    <h4>60 × 90 cm / 24 × 36"</h4>
-                                    <p>Vertical</p>
-                                </article>
-                                <article class="format-card" tabindex="0" aria-label="Format 60 x 90 cm / 24 x 36 inches, Horizontal">
-                                    <span class="format-diagram format-diagram-landscape" aria-hidden="true"></span>
-                                    <h4>60 × 90 cm / 24 × 36"</h4>
-                                    <p>Horizontal</p>
-                                </article>
-                            </div>
-                        </section>
-                        <section class="format-orientation-group" aria-labelledby="largeFormatsTitle">
-                            <h3 id="largeFormatsTitle">Large</h3>
-                            <div class="format-card-list">
-                                <article class="format-card" tabindex="0" aria-label="Format 70 x 100 cm / 28 x 40 inches, Vertical">
-                                    <span class="format-diagram format-diagram-portrait" aria-hidden="true"></span>
-                                    <h4>70 × 100 cm / 28 × 40"</h4>
-                                    <p>Vertical</p>
-                                </article>
-                                <article class="format-card" tabindex="0" aria-label="Format 70 x 100 cm / 28 x 40 inches, Horizontal">
-                                    <span class="format-diagram format-diagram-landscape" aria-hidden="true"></span>
-                                    <h4>70 × 100 cm / 28 × 40"</h4>
-                                    <p>Horizontal</p>
-                                </article>
-                            </div>
-                        </section>
-                    </div>
-                    <div class="material-family-panel" aria-label="Available material families">
-                        <h3>Signature Art Finishes</h3>
-                        <div class="material-family-list">
-                            <span>CicloBeef Signature Frame</span>
-                            <span>CicloBeef Signature Acrylic</span>
+        <section class="section landing-panel section-dark contact-panel cbs-scene" id="contact" aria-labelledby="contactTitle">
+            <div class="cbs-scene__inner">
+                <header class="cbs-scene__heading">
+                    <h2 id="contactTitle">Connect with the Studio</h2>
+                    <div class="cbs-scene__social-block">
+                        <p class="cbs-scene__contact-summary">Customer care.</p>
+                        <p class="cbs-scene__social-cta">Follow CicloBeef Studio</p>
+                        <p class="cbs-scene__social-note">Selected products and studio updates are also showcased on our social channels.</p>
+                        <div class="cbs-scene__channels" aria-label="Studio social channels">
+                            <a class="cbs-scene__social-link" href="https://www.instagram.com/ciclobeefstudio/" aria-label="Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+                            <a class="cbs-scene__social-link" href="https://www.facebook.com/ciclobeefstudio/" aria-label="Facebook"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
                         </div>
                     </div>
-                </div>
-                <p class="quote-note">These formats apply only to CBS Signature Frame and CBS Signature Acrylic. Every other Studio Store piece has its own options, current price, and availability in its product options.</p>
-            </div>
-        </section>
-
-        <section class="section landing-panel section-brand" id="process">
-            <div class="section-inner panel-inner">
-                <h2 class="section-title">From Discovery to Delivery</h2>
-                <div class="process-layout">
-                    <div class="process-content">
-                        <p class="process-subtitle">A direct, secure path from the Studio Store to delivery updates.</p>
-                        <ol class="process-steps">
-                            <li>Discover a piece in the Studio Store.</li>
-                            <li>Choose product-specific options.</li>
-                            <li>Review everything in one shared cart.</li>
-                            <li>Complete secure checkout.</li>
-                            <li>Receive order preparation updates.</li>
-                            <li>Follow delivery with tracking.</li>
-                        </ol>
-                        <a href="#products" class="process-request-cta">Shop the Studio Store</a>
-                    </div>
-                    <div class="process-chat" aria-label="Online order conversation preview">
-                        <div class="process-chat-bubble process-chat-bubble-client" data-speaker="Collector">I found the piece I want.</div>
-                        <div class="process-chat-bubble process-chat-bubble-studio" data-speaker="CicloBeef Studio">Open View options, choose the available configuration, and add it to your cart.</div>
-                        <div class="process-chat-bubble process-chat-bubble-client" data-speaker="Collector">Can I review everything before paying?</div>
-                        <div class="process-chat-bubble process-chat-bubble-studio" data-speaker="CicloBeef Studio">Yes. Your shared cart and secure checkout show the final order details before payment.</div>
-                    </div>
-                    <div class="process-visual cbs-process-assurance" aria-label="Order assurances">
-                        <div><i class="fa-solid fa-lock" aria-hidden="true"></i><strong>Secure checkout</strong><span>Protected payment flow</span></div>
-                        <div><i class="fa-solid fa-box" aria-hidden="true"></i><strong>Order updates</strong><span>Preparation status</span></div>
-                        <div><i class="fa-solid fa-location-dot" aria-hidden="true"></i><strong>Delivery tracking</strong><span>Follow the journey</span></div>
+                </header>
+                <div class="cbs-scene__contact">
+                    <div class="cbs-scene__contact-card">
+                        <h3>Start a conversation</h3>
+                        <a class="cbs-scene__email" href="mailto:ciclobeefstudio@gmail.com">ciclobeefstudio@gmail.com</a>
+                        <p>Email us for order questions, customer care, and general enquiries.</p>
                     </div>
                 </div>
-            </div>
-        </section>
-
-        <section class="section landing-panel section-light" id="quote">
-            <div class="section-inner panel-inner">
-                <div class="quote-direct" aria-labelledby="quoteDirectTitle">
-                    <h2 class="section-title" id="quoteDirectTitle">Custom &amp; Trade Enquiries</h2>
-                    <p class="quote-direct-copy">
-                        Contact the studio for custom projects, trade and business orders,
-                        bulk quantities, institutional purchases, or special requirements.
-                        Standard products are purchased through the Studio Store and secure checkout.
-                    </p>
-                    <a class="cbs-quote-store-link" href="#products">Browse standard products in the Studio Store</a>
-                    <div class="quote-direct-actions" aria-label="Choose a custom enquiry channel">
-                        <a class="quote-direct-link quote-direct-primary" href="https://ig.me/m/ciclobeefstudio" target="_blank" rel="noopener noreferrer">
-                            <i class="fab fa-instagram" aria-hidden="true"></i>
-                            <span>Custom enquiry on Instagram</span>
-                        </a>
-                        <a class="quote-direct-link" href="https://m.me/ciclobeefstudio" target="_blank" rel="noopener noreferrer">
-                            <i class="fab fa-facebook-messenger" aria-hidden="true"></i>
-                            <span>Custom enquiry on Messenger</span>
-                        </a>
-                    </div>
-                    <p class="quote-direct-note">Custom enquiries continue directly with the CicloBeef Studio team and remain separate from standard online purchases.</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="section landing-panel section-dark" id="about">
-            <div class="section-inner panel-inner request-inner">
-                <h2 class="section-title">Why CicloBeef Studio</h2>
-                <p class="about-statement">
-                    CicloBeef Studio creates premium cultural wall art for collectors, offices, and curated spaces that want historical meaning, visual impact, and conversation-starting work.
-                </p>
-                <div class="cards-grid trust-grid">
-                    <article class="trust-card">
-                        <i class="fa-solid fa-book-open" aria-hidden="true"></i>
-                        <h3>Research-Based Artwork</h3>
-                    </article>
-                    <article class="trust-card">
-                        <i class="fa-solid fa-layer-group" aria-hidden="true"></i>
-                        <h3>Premium Visual Production</h3>
-                    </article>
-                    <article class="trust-card">
-                        <i class="fa-solid fa-globe" aria-hidden="true"></i>
-                        <h3>International-Ready Requests</h3>
-                    </article>
-                    <article class="trust-card">
-                        <i class="fa-solid fa-pen-nib" aria-hidden="true"></i>
-                        <h3>Custom Cultural Pieces</h3>
-                    </article>
-                </div>
-
-                <div class="brand-pillars">
-                    <h3>Built for Cultural Presence</h3>
-                    <p>CicloBeef Studio creates premium cultural wall art for spaces that value memory, symbolism, and visual conversation.</p>
-                    <div class="brand-pillar-grid">
-                        <article class="brand-pillar-card">
-                            <h4>Editorial Depth</h4>
-                            <p>Artwork shaped around cultural memory, symbolism, and material context.</p>
-                        </article>
-                        <article class="brand-pillar-card">
-                            <h4>Premium Visual Direction</h4>
-                            <p>A refined visual language built for offices, homes, galleries, and curated interiors.</p>
-                        </article>
-                        <article class="brand-pillar-card">
-                            <h4>Secure Commerce</h4>
-                            <p>Standard pieces use secure checkout, while custom and trade requirements receive direct studio guidance.</p>
-                        </article>
-                        <article class="brand-pillar-card">
-                            <h4>Conversation-Starting Pieces</h4>
-                            <p>Designed to become a visual statement, not generic decoration.</p>
-                        </article>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="section landing-panel section-dark contact-panel" id="contact">
-            <div class="section-inner panel-inner request-inner">
-                <div class="contact-block">
-                    <h2 class="section-title">Connect with the Studio</h2>
-                    <div class="contact-divider" aria-hidden="true"></div>
-                    <p class="request-copy">
-                        Shop standard pieces directly through the Studio Store. For custom projects, trade orders, institutional purchases, or support, contact the studio through your preferred channel.
-                    </p>
-                    <div class="social-buttons primary-social" aria-label="Contact CicloBeef Studio on social media">
-                        <a href="https://ig.me/m/ciclobeefstudio" aria-label="Instagram DM"><i class="fab fa-instagram"></i></a>
-                        <a href="https://facebook.com/ciclobeefstudio" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-                        <a href="https://linkedin.com/company/ciclobeefstudio" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-                    </div>
-                    <p class="email-secondary">
-                        or email us at <a href="mailto:ciclobeefstudio@gmail.com">ciclobeefstudio@gmail.com</a>
-                    </p>
-                </div>
-                <div class="contact-directory" aria-label="CicloBeef Studio directory">
-                    <div class="directory-column">
-                        <h3>CicloBeef Studio</h3>
-                        <details>
-                            <summary>Who we are</summary>
-                            <p>CicloBeef Studio creates premium cultural wall art for spaces that value memory, symbolism, and visual conversation.</p>
-                        </details>
-                        <details>
-                            <summary>Brand vision</summary>
-                            <p>The studio is built around artwork that feels editorial, intentional, and designed for homes, offices, galleries, and curated interiors.</p>
-                        </details>
-                        <details>
-                            <summary>Cultural direction</summary>
-                            <p>Each piece is shaped around cultural memory, symbolism, or archival meaning rather than generic decoration.</p>
-                        </details>
-                    </div>
-                    <div class="directory-column">
-                        <h3>Studio Store</h3>
-                        <details>
-                            <summary>Collections</summary>
-                            <p>The Studio Store organizes original art, faith-led pieces, objects for living, and seasonal selections into clear collections.</p>
-                        </details>
-                        <details>
-                            <summary>Featured works</summary>
-                            <p>Featured works preserve the editorial COL001 experience and connect directly to the two signature art finishes.</p>
-                        </details>
-                        <details>
-                            <summary>Formats</summary>
-                            <p>Signature Art formats define artwork size, orientation, and finish. Other products show their own available options.</p>
-                        </details>
-                        <details>
-                            <summary>Custom quote</summary>
-                            <p>Custom, trade, bulk, institutional, and special-requirement enquiries are reviewed directly by the studio.</p>
-                        </details>
-                    </div>
-                    <div class="directory-column">
-                        <h3>How to Buy</h3>
-                        <details>
-                            <summary>Discover</summary>
-                            <p>Browse the Studio Store and choose the piece that best fits your space or intention.</p>
-                        </details>
-                        <details>
-                            <summary>Choose options</summary>
-                            <p>Open the product interface to review available variants, current price, and availability.</p>
-                        </details>
-                        <details>
-                            <summary>Cart and checkout</summary>
-                            <p>Review products in one shared cart, then continue through secure checkout.</p>
-                        </details>
-                        <details>
-                            <summary>Delivery</summary>
-                            <p>Receive order preparation updates and follow delivery with tracking when available.</p>
-                        </details>
-                    </div>
-                    <div class="directory-column">
-                        <h3>Contact</h3>
-                        <p class="directory-note">Instagram, Facebook, and email support custom enquiries and customer care. LinkedIn remains available for contracts and professional matters.</p>
-                        <a href="https://ig.me/m/ciclobeefstudio">Instagram DM</a>
-                        <a href="https://facebook.com/ciclobeefstudio">Facebook</a>
-                        <a href="https://linkedin.com/company/ciclobeefstudio">LinkedIn</a>
-                        <a href="mailto:ciclobeefstudio@gmail.com">Email</a>
-                    </div>
-                    <div class="directory-column">
-                        <h3>Legal</h3>
-                        <p class="directory-note">Legal pages explain the basic terms, communication rules, and privacy information for CicloBeef Studio.</p>
-                        <a href="/privacy/">Privacy Policy</a>
-                        <a href="/terms/">Terms &amp; Conditions</a>
-                    </div>
-                </div>
-                <div class="contact-faq" aria-label="Before You Message Us">
-                    <h3>Before You Contact Us</h3>
-                    <details>
-                        <summary>When should I request a custom quote?</summary>
-                        <p>Contact the studio for custom projects, trade or bulk orders, institutional purchasing, and requirements not covered by a standard product interface.</p>
-                    </details>
-                    <details>
-                        <summary>Where can I see current prices and options?</summary>
-                        <p>Choose View options on any Studio Store card to review current choices, price, and availability before you add anything to the cart.</p>
-                    </details>
-                    <details>
-                        <summary>Where should I ask for help?</summary>
-                        <p>Use Instagram, Facebook, or email for customer support and custom enquiries. Use LinkedIn for contracts and professional coordination.</p>
-                    </details>
-                </div>
-                <!-- TODO: Add WhatsApp click-to-chat when business phone number is activated -->
-                <footer>
-                    © CicloBeef Studio
+                <footer class="cbs-scene__footer">
+                    <span>© CicloBeef Studio</span>
                     <a href="/privacy/">Privacy</a>
                     <a href="/terms/">Terms</a>
                 </footer>

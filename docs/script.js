@@ -164,135 +164,21 @@ function trapNavFocus(event) {
     }
 }
 
-function initGallery() {
-    const slider = document.querySelector("[data-gallery-slider]");
-    const track = document.querySelector("[data-gallery-track]");
-    const prevButton = document.querySelector("[data-gallery-prev]");
-    const nextButton = document.querySelector("[data-gallery-next]");
+function initSeasonalHero() {
+    const tree = document.querySelector("[data-hero-tree]");
 
-    if (!slider || !track || !prevButton || !nextButton) {
+    if (!tree) {
         return;
     }
 
-    const slides = Array.from(track.children);
-    let activeIndex = 0;
-
-    function updateGallery(index) {
-        if (!slides.length) {
-            return;
-        }
-
-        activeIndex = (index + slides.length) % slides.length;
-        track.scrollTo({
-            left: slides[activeIndex].offsetLeft - track.offsetLeft,
-            behavior: reducedMotionQuery.matches ? "auto" : "smooth",
-        });
-    }
-
-    prevButton.addEventListener("click", () => updateGallery(activeIndex - 1));
-    nextButton.addEventListener("click", () => updateGallery(activeIndex + 1));
-
-    track.addEventListener("scroll", () => {
-        if (!slides.length) {
-            return;
-        }
-
-        const slideWidth = slides[0].getBoundingClientRect().width || 1;
-        const nextIndex = Math.round(track.scrollLeft / slideWidth);
-        if (nextIndex !== activeIndex && nextIndex >= 0 && nextIndex < slides.length) {
-            activeIndex = nextIndex;
-        }
-    }, { passive: true });
-}
-
-function initHeroArtworkReflection() {
-    const reflection = document.querySelector(".hero-artwork-reflection");
-    const hero = document.getElementById("hero");
-
-    if (!reflection || !hero || reducedMotionQuery.matches || !window.gsap) {
+    if (reducedMotionQuery.matches) {
+        tree.classList.add("is-illuminated");
         return;
     }
 
-    let reflectionTimer = null;
-    let activeReflection = null;
-
-    function playReflection() {
-        if (activeReflection && activeReflection.isActive()) {
-            return;
-        }
-
-        window.gsap.set(reflection, { autoAlpha: 0, "--hero-reflection-x": "-118%" });
-        activeReflection = window.gsap.timeline({
-            defaults: { ease: "sine.inOut" },
-            onComplete: () => {
-                activeReflection = null;
-            },
-        });
-
-        activeReflection
-            .to(reflection, { autoAlpha: 0.34, "--hero-reflection-x": "118%", duration: 2.75 })
-            .to(reflection, { autoAlpha: 0, duration: 0.46, ease: "power1.out" });
-    }
-
-    function stopReflection() {
-        if (reflectionTimer) {
-            window.clearInterval(reflectionTimer);
-            reflectionTimer = null;
-        }
-
-        if (activeReflection) {
-            activeReflection.kill();
-            activeReflection = null;
-        }
-
-        window.gsap.set(reflection, { autoAlpha: 0, "--hero-reflection-x": "-118%" });
-    }
-
-    if (!("IntersectionObserver" in window)) {
-        playReflection();
-        reflectionTimer = window.setInterval(playReflection, 8000);
-        return;
-    }
-
-    const observer = new IntersectionObserver(entries => {
-        const isHeroVisible = entries.some(entry => entry.isIntersecting && entry.intersectionRatio >= 0.45);
-
-        if (!isHeroVisible) {
-            stopReflection();
-            return;
-        }
-
-        playReflection();
-
-        if (!reflectionTimer) {
-            reflectionTimer = window.setInterval(playReflection, 8000);
-        }
-    }, { threshold: [0, 0.45, 0.7] });
-
-    observer.observe(hero);
-}
-
-function initCol001ScrollReveal() {
-    if (!window.gsap || !window.ScrollTrigger || reducedMotionQuery.matches) {
-        return;
-    }
-
-    window.gsap.registerPlugin(window.ScrollTrigger);
-    window.gsap.fromTo("[data-gallery-item]", {
-        autoAlpha: 0,
-        y: 22,
-    }, {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.58,
-        stagger: 0.07,
-        ease: "power2.out",
-        scrollTrigger: {
-            trigger: "#gallery",
-            start: "top 72%",
-            once: true,
-        },
-    });
+    window.setTimeout(() => {
+        tree.classList.add("is-illuminated");
+    }, 1500);
 }
 
 function initHeaderNavigationState() {
@@ -359,6 +245,51 @@ function initHeaderNavigationState() {
     updateActiveDestination();
 }
 
+function initAboutFaq() {
+    const items = Array.from(document.querySelectorAll("#about .cbs-about__faq-list details"));
+    const precisePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const mobileViewport = window.matchMedia("(max-width: 600px)");
+
+    if (!items.length) {
+        return;
+    }
+
+    function activateItem(activeItem) {
+        items.forEach(item => {
+            item.open = item === activeItem;
+        });
+    }
+
+    function syncFaqViewport() {
+        if (mobileViewport.matches) {
+            items.forEach(item => {
+                item.open = false;
+            });
+        } else if (!items.some(item => item.open)) {
+            activateItem(items[0]);
+        }
+    }
+
+    items.forEach(item => {
+        const summary = item.querySelector("summary");
+
+        item.addEventListener("pointerenter", event => {
+            if (precisePointer.matches && event.pointerType !== "touch") {
+                activateItem(item);
+            }
+        });
+
+        summary?.addEventListener("focus", () => {
+            if (!mobileViewport.matches) {
+                activateItem(item);
+            }
+        });
+    });
+
+    mobileViewport.addEventListener("change", syncFaqViewport);
+    syncFaqViewport();
+}
+
 if (scrollBtn) {
     scrollBtn.addEventListener("click", () => {
         scrollToSection(document.getElementById("products"));
@@ -395,8 +326,7 @@ document.addEventListener("keydown", event => {
     }
 });
 
-initGallery();
-initHeroArtworkReflection();
-initCol001ScrollReveal();
+initSeasonalHero();
 initHeaderGeometry();
 initHeaderNavigationState();
+initAboutFaq();
