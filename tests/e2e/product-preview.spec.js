@@ -51,9 +51,21 @@ async function checkProductPreview({ page }, testInfo) {
         expect(diagnostic.background).toBe("rgb(255, 253, 247)");
         expect(diagnostic.panel.height).toBe(diagnostic.viewport.height);
     }
-    await expect(frame.locator(".shopify-buy__btn--close")).toBeVisible();
+    const close = frame.locator(".shopify-buy__btn--close");
+    await expect(close).toBeVisible();
+    await expect(close).toHaveCSS("width", "36px");
+    await expect(close).toHaveCSS("height", "36px");
+    await expect(close).toHaveCSS("border-radius", "50%");
+    await expect(close).toHaveCSS("border-width", "0px");
+    await close.blur();
+    await expect(close).toHaveCSS("background-color", "rgb(74, 74, 74)");
+    await expect(close).toHaveCSS("background-size", "10px 10px, 10px 10px");
+    await expect(close).toHaveCSS("box-shadow", "none");
+    await close.focus();
+    await expect(close).toHaveCSS("outline-style", "none");
+    await expect(close).toHaveCSS("background-color", "rgb(90, 90, 90)");
     await expect(add).toBeInViewport();
-    await frame.locator(".shopify-buy__btn--close").click();
+    await close.click();
     await expect(page.locator(".shopify-buy-frame--modal")).toBeHidden();
 }
 
