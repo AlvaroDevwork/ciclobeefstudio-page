@@ -494,8 +494,11 @@ export function createVariantComposerController({
             if (sequence !== loadSequence || activeProduct !== product) return;
             configuration = loaded;
             session = createComposerSubmission({ configuration, manager });
+            const fixedContext = configuration.fixedOptions
+                .map(option => `${option.name}: ${option.value}`)
+                .join(", ");
             status.textContent = configuration.purchasableVariants.length
-                ? "Choose a quantity, then configure each item."
+                ? `${fixedContext ? `${fixedContext}. ` : ""}Choose a quantity, then configure each item.`
                 : "This product is currently unavailable.";
             renderConfiguration();
             focusableElements(dialog)[0]?.focus({ preventScroll: true });
@@ -608,7 +611,7 @@ export function initializeVariantComposerQa({
     if (!isLocalCommerceQaEnabled(locationRef) || typeof getProduct !== "function") return false;
     const activeController = controller ?? createVariantComposerController();
     Array.from(mounts).forEach(node => {
-        const product = getProduct(node.dataset.shopifyProductKey);
+        const product = getProduct(node.dataset.shopifyProductKey, node);
         if (product) activeController.mount(node, product);
     });
     windowRef.CBSVariantComposerQA = activeController;

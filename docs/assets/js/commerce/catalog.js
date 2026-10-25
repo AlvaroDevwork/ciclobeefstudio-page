@@ -1,5 +1,11 @@
 import { SHOPIFY_CONFIG } from "./config.js";
-import { PRODUCT_GROUPS, PRODUCT_REGISTRY, getProductByKey } from "./products.js";
+import {
+    PRODUCT_GROUPS,
+    PRODUCT_REGISTRY,
+    SIGNATURE_MATERIALS,
+    getProductByKey,
+    getProductPresentation,
+} from "./products.js";
 import { getCommerceDiagnostics, mountShopifyProduct } from "./shopify-buy.js";
 import { initializeVariantComposerQa } from "./variant-composer.js";
 
@@ -17,6 +23,27 @@ function escapeHtml(value) {
 }
 
 function getCatalogPresentations(products) {
+    const signatureProducts = SIGNATURE_MATERIALS
+        .map(material => products.find(product => product.key === material.productKey))
+        .filter(Boolean);
+    const standardProducts = products.filter(product => (
+        !SIGNATURE_MATERIALS.some(material => material.productKey === product.key)
+    ));
+
+    if (signatureProducts.length === SIGNATURE_MATERIALS.length) {
+        const artworkPresentations = signatureProducts[0].previews.map((preview, previewIndex) => ({
+            product: signatureProducts[0],
+            preview,
+            previewIndex,
+            signatureProducts: signatureProducts.map(product => getProductPresentation(product, previewIndex)),
+        }));
+
+        return [
+            ...artworkPresentations,
+            ...standardProducts.map(product => ({ product, preview: product.image, previewIndex: 0 })),
+        ];
+    }
+
     const maximumPreviewCount = Math.max(
         1,
         ...products.map(product => product.previews?.length ?? 1),
@@ -39,9 +66,32 @@ function getPresentationMountId(product, previewIndex) {
 }
 
 function renderProductCard(presentation, position, total) {
-    const { product, preview, previewIndex } = presentation;
+    const { product, preview, previewIndex, signatureProducts = null } = presentation;
     const mountId = getPresentationMountId(product, previewIndex);
     const titleId = `${mountId}-title`;
+    const cardTitle = signatureProducts ? preview.artwork : product.title;
+    const commerceMarkup = signatureProducts
+        ? signatureProducts.map((signatureProduct, materialIndex) => `
+            <div
+                class="cbs-commerce-mount${materialIndex === 0 ? "" : " cbs-commerce-mount--coordinated"}"
+                id="${escapeHtml(getPresentationMountId(signatureProduct, previewIndex))}"
+                data-shopify-product-key="${escapeHtml(signatureProduct.key)}"
+                data-catalog-preview-index="${previewIndex}"
+                data-signature-artwork="${escapeHtml(preview.artwork)}"
+                data-signature-material="${escapeHtml(SIGNATURE_MATERIALS[materialIndex].label)}"
+                aria-label="Buy ${escapeHtml(preview.artwork)} in ${escapeHtml(SIGNATURE_MATERIALS[materialIndex].label)}"
+                ${materialIndex === 0 ? "" : "hidden"}
+            ></div>
+        `).join("")
+        : `
+            <div
+                class="cbs-commerce-mount"
+                id="${escapeHtml(mountId)}"
+                data-shopify-product-key="${escapeHtml(product.key)}"
+                data-catalog-preview-index="${previewIndex}"
+                aria-label="Buy ${escapeHtml(product.title)}"
+            ></div>
+        `;
 
     return `
         <article
@@ -61,15 +111,9 @@ function renderProductCard(presentation, position, total) {
                 />
             </figure>
             <div class="cbs-product-card__body">
-                <h4 id="${escapeHtml(titleId)}">${escapeHtml(product.title)}</h4>
+                <h4 id="${escapeHtml(titleId)}">${escapeHtml(cardTitle)}</h4>
                 <div class="cbs-product-card__commerce">
-                    <div
-                        class="cbs-commerce-mount"
-                        id="${escapeHtml(mountId)}"
-                        data-shopify-product-key="${escapeHtml(product.key)}"
-                        data-catalog-preview-index="${previewIndex}"
-                        aria-label="Buy ${escapeHtml(product.title)}"
-                    ></div>
+                    ${commerceMarkup}
                 </div>
             </div>
         </article>
@@ -123,11 +167,11 @@ function renderCatalog() {
                         : `<div class="cbs-store-group__header" aria-hidden="true"></div>`}
                     <div class="cbs-store-pager" aria-label="${escapeHtml(group.title)} product controls">
                         <button type="button" class="cbs-store-pager__button" data-store-prev aria-label="Previous ${escapeHtml(group.title)} product">
-                            <span aria-hidden="true">←</span>
+                            <span aria-hidden="true">‹</span>
                         </button>
                         <span class="cbs-store-pager__status" data-store-status aria-live="polite">01 / ${String(presentations.length).padStart(2, "0")}</span>
                         <button type="button" class="cbs-store-pager__button" data-store-next aria-label="Next ${escapeHtml(group.title)} product">
-                            <span aria-hidden="true">→</span>
+                            <span aria-hidden="true">›</span>
                         </button>
                     </div>
                 </div>
@@ -300,7 +344,7 @@ function validateMount(node) {
         return null;
     }
 
-    return product;
+    return getProductPresentation(product, previewIndex);
 }
 
 export function initCommerceCatalog() {
@@ -315,7 +359,7 @@ export function initCommerceCatalog() {
     linkProductReferences();
     const mounts = Array.from(document.querySelectorAll(SHOPIFY_CONFIG.mountSelector));
 
-    if (initializeVariantComposerQa({ mounts, getProduct: getProductByKey })) {
+    if (initializeVariantComposerQa({ mounts, getProduct: (_key, node) => validateMount(node) })) {
         return;
     }
 
@@ -326,8 +370,20 @@ export function initCommerceCatalog() {
         }
     };
 
+    const mountCardProducts = node => {
+        const card = node.closest(".cbs-product-card");
+        const coordinatedMounts = card?.querySelectorAll("[data-signature-artwork][data-shopify-product-key]");
+
+        if (coordinatedMounts?.length) {
+            coordinatedMounts.forEach(coordinatedNode => mount(coordinatedNode));
+            return;
+        }
+
+        mount(node);
+    };
+
     if (!("IntersectionObserver" in window)) {
-        mounts.forEach(mount);
+        mounts.forEach(mountCardProducts);
         return;
     }
 
@@ -337,8 +393,10 @@ export function initCommerceCatalog() {
                 return;
             }
 
-            observer.unobserve(entry.target);
-            mount(entry.target);
+            const cardMounts = entry.target.closest(".cbs-product-card")
+                ?.querySelectorAll("[data-shopify-product-key]") ?? [entry.target];
+            cardMounts.forEach(cardMount => observer.unobserve(cardMount));
+            mountCardProducts(entry.target);
         });
     }, SHOPIFY_CONFIG.observer);
 

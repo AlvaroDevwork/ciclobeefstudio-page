@@ -6,7 +6,14 @@ let uiPromise = null;
 let uiInstance = null;
 let modalReturnPosition = null;
 let stopModalViewportTracking = null;
+let activeSignatureCoordinator = null;
+let materialSwitchInProgress = false;
 const mountPromises = new WeakMap();
+const signatureCoordinators = new Map();
+const SIGNATURE_MATERIALS = Object.freeze([
+    Object.freeze({ label: "Signature Frame", productId: "8296598536261" }),
+    Object.freeze({ label: "Signature Acrylic", productId: "8296938537029" }),
+]);
 const CART_LINE_QUANTITY_TEMPLATE = `
     <div class="{{data.classes.lineItem.controls}}" data-element="lineItem.controls">
         <div class="{{data.classes.lineItem.quantity}}" data-element="lineItem.quantity">
@@ -88,10 +95,12 @@ function clearModalViewport() {
 }
 
 function captureModalReturnPosition() {
-    modalReturnPosition = Object.freeze({
-        left: window.scrollX,
-        top: window.scrollY,
-    });
+    if (!modalReturnPosition) {
+        modalReturnPosition = Object.freeze({
+            left: window.scrollX,
+            top: window.scrollY,
+        });
+    }
     beginModalViewportTracking();
 }
 
@@ -110,12 +119,89 @@ function scrollToSavedPosition(position) {
     window.requestAnimationFrame(restore);
 }
 
+function formatModalTypography(documentRef) {
+    documentRef.querySelectorAll(
+        ".shopify-buy__product-description h1, .shopify-buy__product-description h2, .shopify-buy__product-description h3, .shopify-buy__product-description h4, .shopify-buy__product-description h5, .shopify-buy__product-description h6",
+    ).forEach(titleNode => {
+        titleNode.style.fontWeight = "400";
+    });
+
+    documentRef.querySelectorAll("[data-element='product.price']").forEach(priceNode => {
+        if (priceNode.querySelector(".cbs-modal-price__decimals")) {
+            return;
+        }
+
+        const priceText = priceNode.textContent.trim();
+        const priceParts = priceText.match(/^(.*?)([.,]\d{2})(\s*[A-Z]{3})?$/);
+
+        if (!priceParts) {
+            return;
+        }
+
+        priceNode.style.display = "inline-block";
+        priceNode.style.height = "16.8px";
+        priceNode.style.lineHeight = "16.8px";
+
+        const decimals = documentRef.createElement("span");
+        decimals.className = "cbs-modal-price__decimals";
+        decimals.textContent = priceParts[2];
+        decimals.style.fontSize = "0.64em";
+        decimals.style.fontWeight = "400";
+        decimals.style.letterSpacing = "0";
+        decimals.style.position = "relative";
+        decimals.style.top = "-0.32em";
+
+        priceNode.replaceChildren(
+            documentRef.createTextNode(priceParts[1]),
+            decimals,
+            documentRef.createTextNode(priceParts[3] ?? ""),
+        );
+    });
+}
+
+function enhanceModalTypography(attempt = 0) {
+    const modalFrame = document.querySelector(".shopify-buy-frame--modal iframe");
+    const modalDocument = modalFrame?.contentDocument;
+
+    if (!modalDocument?.body) {
+        if (attempt < 12) {
+            window.requestAnimationFrame(() => enhanceModalTypography(attempt + 1));
+        }
+        return;
+    }
+
+    formatModalTypography(modalDocument);
+
+    if (modalDocument.documentElement.dataset.cbsTypographyObserver === "true") {
+        return;
+    }
+
+    modalDocument.documentElement.dataset.cbsTypographyObserver = "true";
+    const observer = new modalDocument.defaultView.MutationObserver(() => {
+        formatModalTypography(modalDocument);
+        renderSignatureMaterialSelector();
+    });
+    observer.observe(modalDocument.body, {
+        childList: true,
+        characterData: true,
+        subtree: true,
+    });
+}
+
 function maintainModalReturnPosition() {
     syncModalViewport();
     scrollToSavedPosition(modalReturnPosition);
+    window.requestAnimationFrame(() => {
+        enhanceModalTypography();
+        renderSignatureMaterialSelector();
+    });
 }
 
 function restoreModalReturnPosition() {
+    if (materialSwitchInProgress) {
+        return;
+    }
+
     const returnPosition = modalReturnPosition;
     modalReturnPosition = null;
 
@@ -194,19 +280,14 @@ export async function getShopifyUi() {
     return uiPromise;
 }
 
-function getMobileSignaturePresentation(product, node) {
-    const usesPhoneViewport = window.matchMedia(
-        "(max-width: 499px), (max-height: 499px) and (hover: none) and (pointer: coarse)",
-    ).matches;
+function getSignaturePresentation(product) {
+    const presentation = product.group === "signature-art"
+        ? product.presentation
+        : null;
 
-    if (product.group !== "signature-art" || !usesPhoneViewport) {
-        return null;
-    }
-
-    const previewIndex = Number.parseInt(node.dataset.catalogPreviewIndex ?? "0", 10);
-    const preview = product.previews?.[previewIndex];
-
-    return preview?.artwork && preview?.variantId ? preview : null;
+    return presentation?.variantId && presentation?.selectedOptions?.length
+        ? presentation
+        : null;
 }
 
 function getVariantOptionValue(variant, optionName) {
@@ -214,22 +295,212 @@ function getVariantOptionValue(variant, optionName) {
     return options.find(option => option.name === optionName)?.value ?? null;
 }
 
-function scopeSignatureArtworkImages(component, artwork) {
-    if (!artwork || !Array.isArray(component?.model?.images) || !Array.isArray(component?.model?.variants)) {
+function optionValueIdentity(value) {
+    return typeof value === "string" ? value : value?.value ?? value?.name ?? null;
+}
+
+function componentProductId(component) {
+    return String(component?.model?.id ?? "").split("/").pop();
+}
+
+function componentVariantId(component) {
+    return String(component?.selectedVariant?.id ?? "").split("/").pop();
+}
+
+function signatureCoordinatorFor(product, presentation) {
+    if (!presentation?.artwork) {
+        return null;
+    }
+
+    let coordinator = signatureCoordinators.get(presentation.artwork);
+
+    if (!coordinator) {
+        coordinator = {
+            artwork: presentation.artwork,
+            activeMaterial: SIGNATURE_MATERIALS[0].label,
+            components: new Map(),
+        };
+        signatureCoordinators.set(presentation.artwork, coordinator);
+    }
+
+    const material = SIGNATURE_MATERIALS.find(candidate => candidate.productId === product.productId);
+    return material ? { coordinator, material } : null;
+}
+
+function registerSignatureComponent(component, product, presentation) {
+    const registration = signatureCoordinatorFor(product, presentation);
+
+    if (!registration) {
         return;
     }
 
-    const artworkImageOrientations = new Map();
-    component.model.variants
-        .filter(variant => getVariantOptionValue(variant, "Artwork") === artwork)
-        .forEach(variant => {
-            const imageId = variant.image?.id;
-            const orientation = getVariantOptionValue(variant, "Orientation");
+    registration.coordinator.components.set(registration.material.label, component);
+}
 
-            if (imageId && (orientation === "Horizontal" || orientation === "Vertical")) {
-                artworkImageOrientations.set(imageId, orientation);
-            }
+function activateModalContext(component, product, presentation) {
+    const registration = signatureCoordinatorFor(product, presentation);
+    activeSignatureCoordinator = registration?.coordinator ?? null;
+
+    if (registration) {
+        registration.coordinator.activeMaterial = registration.material.label;
+        registration.coordinator.activeComponent = component;
+    }
+
+    captureModalReturnPosition();
+}
+
+function applyComponentOptions(component, options) {
+    ["Orientation", "Size"].forEach(optionName => {
+        if (options[optionName]) {
+            component.updateVariant(optionName, options[optionName]);
+        }
+    });
+
+    return component.selectedVariant
+        && component.selectedOptions?.Artwork === options.Artwork
+        && component.selectedOptions?.Orientation === options.Orientation
+        && component.selectedOptions?.Size === options.Size;
+}
+
+async function switchSignatureMaterial(materialLabel, select) {
+    const coordinator = activeSignatureCoordinator;
+    const currentComponent = coordinator?.activeComponent;
+    const currentModalProduct = currentComponent?.modal?.product;
+    const targetComponent = coordinator?.components.get(materialLabel);
+
+    if (
+        !coordinator
+        || !currentModalProduct
+        || !targetComponent
+        || materialLabel === coordinator.activeMaterial
+    ) {
+        return;
+    }
+
+    const selectedOptions = Object.freeze({
+        Artwork: coordinator.artwork,
+        Orientation: currentModalProduct.selectedOptions?.Orientation,
+        Size: currentModalProduct.selectedOptions?.Size,
+    });
+    const expectedProduct = SIGNATURE_MATERIALS.find(material => material.label === materialLabel);
+
+    select.disabled = true;
+    select.setAttribute("aria-busy", "true");
+
+    if (
+        !applyComponentOptions(targetComponent, selectedOptions)
+        || componentProductId(targetComponent) !== expectedProduct?.productId
+        || !componentVariantId(targetComponent)
+    ) {
+        select.value = coordinator.activeMaterial;
+        select.disabled = false;
+        select.removeAttribute("aria-busy");
+        console.error(`CicloBeef material variant could not be resolved for ${coordinator.artwork}.`);
+        return;
+    }
+
+    materialSwitchInProgress = true;
+    await Promise.resolve(currentComponent.modal.close());
+    await Promise.resolve(targetComponent.openModal());
+    const targetModalProduct = targetComponent.modal?.product;
+
+    if (
+        !applyComponentOptions(targetModalProduct, selectedOptions)
+        || componentProductId(targetModalProduct) !== expectedProduct.productId
+        || !componentVariantId(targetModalProduct)
+    ) {
+        console.error(`CicloBeef material modal could not be resolved for ${coordinator.artwork}.`);
+        await Promise.resolve(targetComponent.modal?.close());
+        await Promise.resolve(currentComponent.openModal());
+        applyComponentOptions(currentComponent.modal?.product, selectedOptions);
+    }
+
+    materialSwitchInProgress = false;
+}
+
+function renderSignatureMaterialSelector() {
+    const coordinator = activeSignatureCoordinator;
+    const modalFrame = document.querySelector(".shopify-buy-frame--modal iframe");
+    const modalDocument = modalFrame?.contentDocument;
+    const orientation = modalDocument?.querySelector('select[name="Orientation"]');
+
+    if (!coordinator || !orientation || coordinator.components.size !== SIGNATURE_MATERIALS.length) {
+        return;
+    }
+
+    const existing = modalDocument.querySelector('select[name="Material"]');
+
+    if (existing) {
+        existing.value = coordinator.activeMaterial;
+        return;
+    }
+
+    const field = modalDocument.createElement("div");
+    field.className = "shopify-buy__option-select cbs-signature-material";
+    const label = modalDocument.createElement("label");
+    label.className = "shopify-buy__option-select__label";
+    label.textContent = "Material";
+    const wrapper = modalDocument.createElement("div");
+    wrapper.className = "shopify-buy__option-select-wrapper";
+    const select = modalDocument.createElement("select");
+    const selectId = `cbs-signature-material-${coordinator.artwork.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+    select.id = selectId;
+    select.name = "Material";
+    select.className = "shopify-buy__option-select__select";
+    label.htmlFor = selectId;
+
+    SIGNATURE_MATERIALS.forEach(material => {
+        const option = modalDocument.createElement("option");
+        option.value = material.label;
+        option.textContent = material.label;
+        select.append(option);
+    });
+
+    select.value = coordinator.activeMaterial;
+    select.addEventListener("change", () => {
+        switchSignatureMaterial(select.value, select).catch(error => {
+            materialSwitchInProgress = false;
+            console.error("CicloBeef material switch failed.", error);
         });
+    });
+    wrapper.append(select);
+    field.append(label, wrapper);
+    orientation.closest(".shopify-buy__option-select")?.before(field);
+}
+
+export function scopeSignaturePresentation(component, presentation) {
+    const selectedOptions = presentation?.selectedOptions ?? [];
+
+    if (
+        !selectedOptions.length
+        || !Array.isArray(component?.model?.images)
+        || !Array.isArray(component?.model?.variants)
+    ) {
+        return false;
+    }
+
+    const scopedVariants = component.model.variants.filter(variant => (
+        selectedOptions.every(expected => getVariantOptionValue(variant, expected.name) === expected.value)
+    ));
+    const selectedVariantId = String(presentation.variantId);
+
+    if (
+        !scopedVariants.length
+        || !scopedVariants.some(variant => String(variant.id).split("/").pop() === selectedVariantId)
+    ) {
+        console.error(`CicloBeef presentation variants could not be resolved for ${presentation.artwork}.`);
+        return false;
+    }
+
+    const artworkImageOrientations = new Map();
+    scopedVariants.forEach(variant => {
+        const imageId = variant.image?.id;
+        const orientation = getVariantOptionValue(variant, "Orientation");
+
+        if (imageId && (orientation === "Horizontal" || orientation === "Vertical")) {
+            artworkImageOrientations.set(imageId, orientation);
+        }
+    });
 
     const retainedOrientations = new Set();
     const artworkImages = component.model.images.filter(image => {
@@ -248,15 +519,35 @@ function scopeSignatureArtworkImages(component, artwork) {
         || !retainedOrientations.has("Horizontal")
         || !retainedOrientations.has("Vertical")
     ) {
-        console.error(`CicloBeef artwork orientations could not be resolved for ${artwork}.`);
-        return;
+        console.error(`CicloBeef artwork orientations could not be resolved for ${presentation.artwork}.`);
+        return false;
     }
 
+    const scopedOptionValues = selectedOptions.map(expected => {
+        const option = component.model.options?.find(candidate => candidate.name === expected.name);
+        const values = Array.isArray(option?.values)
+            ? option.values.filter(value => optionValueIdentity(value) === expected.value)
+            : [];
+
+        return { option, values };
+    });
+
+    if (scopedOptionValues.some(({ option, values }) => !option || values.length !== 1)) {
+        console.error(`CicloBeef presentation options could not be resolved for ${presentation.artwork}.`);
+        return false;
+    }
+
+    component.model.variants.splice(0, component.model.variants.length, ...scopedVariants);
     component.model.images.splice(0, component.model.images.length, ...artworkImages);
+    scopedOptionValues.forEach(({ option, values }) => {
+        option.values.splice(0, option.values.length, ...values);
+    });
+    return true;
 }
 
-function componentOptions(signaturePresentation = null) {
+function componentOptions(product, signaturePresentation = null) {
     const supportsDesktopHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    const usesDesktopNavigation = supportsDesktopHover && window.matchMedia("(min-width: 1025px)").matches;
     const usesCompactViewport = window.matchMedia("(max-width: 499px)").matches;
     const usesTabletViewport = window.matchMedia(
         "(min-width: 641px) and (max-width: 1180px), (min-width: 641px) and (max-width: 1366px) and (hover: none) and (pointer: coarse)",
@@ -308,33 +599,44 @@ function componentOptions(signaturePresentation = null) {
             "opacity": "1",
         }
         : {};
-    const modalCloseStyle = usesCompactViewport
-        ? {
-            "display": "flex",
-            "align-items": "center",
-            "justify-content": "center",
-            "border": "1px solid rgba(255, 255, 255, 0.72)",
-            "border-radius": "50%",
-            "background-color": "#363636",
-            "background-image": "linear-gradient(45deg, transparent 43%, #FFFFFF 43%, #FFFFFF 57%, transparent 57%), linear-gradient(-45deg, transparent 43%, #FFFFFF 43%, #FFFFFF 57%, transparent 57%)",
-            "background-position": "center",
-            "background-repeat": "no-repeat",
-            "background-size": "16px 16px",
-            "box-shadow": "0 8px 20px rgba(26, 26, 26, 0.24)",
-            "color": "#FFFFFF",
-            "font-size": "0",
-            "font-weight": "400",
-            "line-height": "0",
-            "text-align": "center",
-        }
-        : {};
+    const modalCloseStyle = {
+        "display": "flex",
+        "align-items": "center",
+        "justify-content": "center",
+        "box-sizing": "border-box",
+        "border": "0",
+        "border-radius": "50%",
+        "outline": "none",
+        "background-color": "#4A4A4A",
+        "background-image": "linear-gradient(45deg, transparent 43%, #FFFFFF 43%, #FFFFFF 57%, transparent 57%), linear-gradient(-45deg, transparent 43%, #FFFFFF 43%, #FFFFFF 57%, transparent 57%)",
+        "background-position": "center",
+        "background-repeat": "no-repeat",
+        "background-size": "10px 10px",
+        "box-shadow": "none",
+        "color": "#FFFFFF",
+        "font-size": "0",
+        "font-weight": "400",
+        "line-height": "0",
+        "text-align": "center",
+        ":hover": {
+            "background-color": "#565656",
+        },
+        ":focus": {
+            "outline": "none",
+            "background-color": "#5A5A5A",
+        },
+    };
 
     return {
         product: {
             buttonDestination: "modal",
             events: {
-                afterInit: component => scopeSignatureArtworkImages(component, signaturePresentation?.artwork),
-                openModal: captureModalReturnPosition,
+                afterInit: component => {
+                    if (scopeSignaturePresentation(component, signaturePresentation)) {
+                        registerSignatureComponent(component, product, signaturePresentation);
+                    }
+                },
+                openModal: component => activateModalContext(component, product, signaturePresentation),
             },
             contents: {
                 img: false,
@@ -410,11 +712,21 @@ function componentOptions(signaturePresentation = null) {
                 title: {
                     "font-family": "Playfair Display, serif",
                     "font-size": usesCompactViewport ? "22px" : "26px",
+                    "font-weight": "400",
                     "line-height": "1.2",
                     ...(usesContainedModal ? { "color": "#242424" } : {}),
                 },
                 compareAt: {
                     "display": "none",
+                },
+                price: {
+                    "color": "#242424",
+                    "font-family": "Inter, sans-serif",
+                    "font-size": usesCompactViewport ? "22px" : "26px",
+                    "font-variant-numeric": "tabular-nums",
+                    "font-weight": "600",
+                    "letter-spacing": "-0.02em",
+                    "line-height": "16.8px",
                 },
                 description: {
                     "max-height": "7.5em",
@@ -425,12 +737,25 @@ function componentOptions(signaturePresentation = null) {
                     ...(usesContainedModal ? { "color": "#363636" } : {}),
                 },
                 button: {
-                    "background-color": "#1a1a1a",
+                    ...(usesDesktopNavigation ? {
+                        "background-color": "#363636",
+                        "color": "#FFFFFF",
+                        "font-size": "12px",
+                        "letter-spacing": "0.02em",
+                        "min-height": "38px",
+                        "padding": "10px 18px",
+                    } : {
+                        "background-color": "#1a1a1a",
+                    }),
                     "border-radius": "999px",
                     "font-family": "Inter, sans-serif",
                     "font-weight": "700",
-                    ":hover": { "background-color": "#8a6500" },
-                    ":focus": { "background-color": "#8a6500" },
+                    ":hover": usesDesktopNavigation
+                        ? productButtonHoverStyle
+                        : { "background-color": "#8a6500" },
+                    ":focus": usesDesktopNavigation
+                        ? { "background-color": "#4a4a4a" }
+                        : { "background-color": "#8a6500" },
                 },
             },
         },
@@ -520,8 +845,8 @@ function componentOptions(signaturePresentation = null) {
                     "position": "fixed",
                     "top": "calc(8px + env(safe-area-inset-top))",
                     "right": "calc(8px + env(safe-area-inset-right))",
-                    "width": "44px",
-                    "height": "44px",
+                    "width": "36px",
+                    "height": "36px",
                     "font-size": "36px",
                     "line-height": "40px",
                     "padding": "0",
@@ -615,10 +940,33 @@ function componentOptions(signaturePresentation = null) {
         toggle: {
             styles: {
                 toggle: {
-                    "background-color": "#1a1a1a",
-                    ":hover": { "background-color": "#8a6500" },
-                    ":focus": { "background-color": "#8a6500" },
+                    ...(usesDesktopNavigation ? {
+                        "display": "inline-flex",
+                        "flex-direction": "column",
+                        "align-items": "center",
+                        "justify-content": "center",
+                        "padding": "4px 6px",
+                        "border-radius": "0",
+                        "background-color": "transparent",
+                        "box-shadow": "none",
+                        "color": "#FFFFFF",
+                    } : {
+                        "background-color": "#1a1a1a",
+                    }),
+                    ":hover": usesDesktopNavigation
+                        ? { "background-color": "transparent", "color": "#FFC300" }
+                        : { "background-color": "#8a6500" },
+                    ":focus": usesDesktopNavigation
+                        ? { "background-color": "transparent", "color": "#FFC300" }
+                        : { "background-color": "#8a6500" },
                 },
+                count: usesDesktopNavigation ? {
+                    "margin-right": "0",
+                    "margin-bottom": "1px",
+                    "font-size": "12px",
+                    "font-weight": "600",
+                    "line-height": "1",
+                } : {},
             },
         },
     };
@@ -634,12 +982,12 @@ export function mountShopifyProduct(product, node) {
 
         try {
             const ui = await getShopifyUi();
-            const signaturePresentation = getMobileSignaturePresentation(product, node);
+            const signaturePresentation = getSignaturePresentation(product);
             const result = ui.createComponent("product", {
                 id: product.productId,
                 ...(signaturePresentation ? { variantId: signaturePresentation.variantId } : {}),
                 node,
-                options: componentOptions(signaturePresentation),
+                options: componentOptions(product, signaturePresentation),
             });
 
             await Promise.resolve(result);
@@ -662,5 +1010,18 @@ export function getCommerceDiagnostics() {
         uiCount: uiInstance ? 1 : 0,
         cartRuntimeCount: uiInstance?.components?.cart?.length ?? 0,
         productComponentCount: uiInstance?.components?.product?.length ?? 0,
+        signatureCoordinatorCount: signatureCoordinators.size,
+        signatureCoordinators: [...signatureCoordinators.values()].map(coordinator => Object.freeze({
+            artwork: coordinator.artwork,
+            activeMaterial: coordinator.activeMaterial,
+            componentCount: coordinator.components.size,
+            productId: componentProductId(coordinator.activeComponent),
+            variantId: componentVariantId(coordinator.activeComponent?.modal?.product ?? coordinator.activeComponent),
+            selectedOptions: Object.freeze({
+                ...(coordinator.activeComponent?.modal?.product?.selectedOptions
+                    ?? coordinator.activeComponent?.selectedOptions
+                    ?? {}),
+            }),
+        })),
     });
 }

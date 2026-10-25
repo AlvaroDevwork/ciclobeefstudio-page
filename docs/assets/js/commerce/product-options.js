@@ -65,6 +65,20 @@ function normalizeVariant(variant) {
     });
 }
 
+function variantMatchesPresentation(variant, presentation) {
+    const selectedOptions = presentation?.selectedOptions ?? [];
+
+    return selectedOptions.every(expected => (
+        (variant?.selectedOptions ?? []).some(option => (
+            option.name === expected.name && option.value === expected.value
+        ))
+    ));
+}
+
+function variantMatchesId(variant, variantId) {
+    return String(variant?.id ?? "").split("/").pop() === String(variantId ?? "");
+}
+
 function classifyProduct(variants, optionNames) {
     const purchasable = variants.filter(variant => variant.purchasable);
 
@@ -83,10 +97,24 @@ function classifyProduct(variants, optionNames) {
 }
 
 export function normalizeProductOptions({ registryProduct, storefrontProduct, variants }) {
-    const normalizedVariants = Object.freeze(variants.map(normalizeVariant));
+    const presentation = registryProduct.presentation ?? null;
+    const fixedOptions = Object.freeze((presentation?.selectedOptions ?? []).map(normalizeOption));
+    const fixedOptionNames = new Set(fixedOptions.map(option => option.name));
+    const scopedVariants = presentation
+        ? variants.filter(variant => variantMatchesPresentation(variant, presentation))
+        : variants;
+
+    if (
+        presentation?.variantId
+        && !scopedVariants.some(variant => variantMatchesId(variant, presentation.variantId))
+    ) {
+        throw new Error(`The selected presentation variant is not available for ${registryProduct.key}.`);
+    }
+
+    const normalizedVariants = Object.freeze(scopedVariants.map(normalizeVariant));
     const optionNames = Object.freeze([...new Set(
         normalizedVariants.flatMap(variant => variant.selectedOptions)
-            .filter(option => !isDefaultOption(option) && option.value)
+            .filter(option => !isDefaultOption(option) && option.value && !fixedOptionNames.has(option.name))
             .map(option => option.name),
     )]);
     const purchaseMode = classifyProduct(normalizedVariants, optionNames);
@@ -96,6 +124,8 @@ export function normalizeProductOptions({ registryProduct, storefrontProduct, va
         productId: registryProduct.productId,
         title: String(storefrontProduct.title ?? registryProduct.title),
         availableForSale: storefrontProduct.availableForSale === true,
+        presentation,
+        fixedOptions,
         optionNames,
         purchaseMode,
         variants: normalizedVariants,
