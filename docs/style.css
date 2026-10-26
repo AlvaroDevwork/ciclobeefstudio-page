@@ -245,6 +245,239 @@ a {
     opacity: 0;
 }
 
+@media (min-width: 1025px) {
+    .hero-visual-slot {
+        --hero-ambient-blur: 76px;
+        --hero-ambient-opacity: 0.58;
+    }
+
+    .hero-visual-slot::before {
+        content: "";
+        position: absolute;
+        z-index: 0;
+        top: 50%;
+        left: 50%;
+        width: min(52vw, 42rem);
+        aspect-ratio: 1;
+        background:
+            radial-gradient(ellipse 24% 18% at 50% 20%, rgba(255, 220, 155, 0.84) 0%, rgba(255, 197, 90, 0.64) 30%, rgba(255, 184, 65, 0.28) 64%, transparent 100%),
+            radial-gradient(ellipse 31% 25% at 24% 40%, rgba(255, 211, 126, 0.9) 0%, rgba(255, 190, 70, 0.68) 32%, rgba(255, 180, 55, 0.3) 66%, transparent 100%),
+            radial-gradient(ellipse 31% 25% at 76% 40%, rgba(255, 211, 126, 0.9) 0%, rgba(255, 190, 70, 0.68) 32%, rgba(255, 180, 55, 0.3) 66%, transparent 100%),
+            radial-gradient(ellipse 22% 26% at 50% 44%, rgba(255, 205, 110, 0.55) 0%, rgba(255, 188, 72, 0.38) 38%, rgba(255, 180, 55, 0.16) 70%, transparent 100%),
+            radial-gradient(ellipse 21% 28% at 50% 63%, rgba(255, 205, 110, 0.78) 0%, rgba(255, 188, 72, 0.52) 38%, rgba(255, 180, 55, 0.24) 70%, transparent 100%),
+            radial-gradient(ellipse 26% 16% at 50% 64%, rgb(255 220 155) 0%, rgba(255, 196, 82, 0.98) 34%, rgba(255, 180, 48, 0.78) 62%, rgba(255, 170, 32, 0.35) 82%, transparent 100%);
+        filter: blur(var(--hero-ambient-blur));
+        opacity: 0;
+        pointer-events: none;
+        transform: translate(-50%, -50%);
+        transform-origin: center;
+        transition: opacity 920ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .hero-visual-slot:has(.hero-tree-stage.is-illuminated)::before {
+        opacity: var(--hero-ambient-opacity);
+    }
+
+    .hero-tree-stage {
+        z-index: 1;
+        width: min(100%, clamp(18rem, 33vw, 29rem));
+        --hero-glow-near-blur: 16px;
+        --hero-glow-near-opacity: 0.35;
+        --hero-glow-near-scale: 1;
+        --hero-glow-mid-blur: 36px;
+        --hero-glow-mid-opacity: 0.3;
+        --hero-glow-mid-scale: 1.012;
+        --hero-glow-wide-blur: 66px;
+        --hero-glow-wide-opacity: 0.2;
+        --hero-glow-wide-scale: 1.025;
+    }
+
+    .hero-tree-glow,
+    .hero-tree-stage::before,
+    .hero-tree-stage::after {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0;
+        background: linear-gradient(180deg, rgb(255 190 70) 0%, rgb(255 190 70) 87%, rgba(255, 190, 70, 0.26) 90%, transparent 93%);
+        -webkit-mask-image: url("assets/images/hero/CBS-HERO-U01-CROSS-TREE-GLOW.png");
+        mask-image: url("assets/images/hero/CBS-HERO-U01-CROSS-TREE-GLOW.png");
+        -webkit-mask-position: center;
+        mask-position: center;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        transform-origin: center;
+        transition: opacity 760ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .hero-tree-glow {
+        z-index: 0;
+        inset: 0;
+        border-radius: 0;
+        filter: blur(var(--hero-glow-wide-blur));
+        transform: scale(var(--hero-glow-wide-scale));
+    }
+
+    .hero-tree-stage::before {
+        content: "";
+        z-index: 1;
+        filter: blur(var(--hero-glow-mid-blur));
+        transform: scale(var(--hero-glow-mid-scale));
+    }
+
+    .hero-tree-stage::after {
+        content: "";
+        z-index: 2;
+        filter: blur(var(--hero-glow-near-blur));
+        transform: scale(var(--hero-glow-near-scale));
+    }
+
+    .hero-tree-image {
+        z-index: 3;
+    }
+
+    .hero-tree-stage.is-illuminated .hero-tree-glow {
+        opacity: var(--hero-glow-wide-opacity);
+    }
+
+    .hero-tree-stage.is-illuminated::before {
+        opacity: var(--hero-glow-mid-opacity);
+    }
+
+    .hero-tree-stage.is-illuminated::after {
+        opacity: var(--hero-glow-near-opacity);
+    }
+}
+
+@media (max-width: 1024px) {
+    .hero-visual-slot {
+        --hero-ambient-blur: 68px;
+        --hero-ambient-opacity: 0.52;
+    }
+
+    .hero-visual-slot::before {
+        content: "";
+        position: absolute;
+        z-index: 0;
+        top: 50%;
+        left: 50%;
+        width: min(90vw, 46rem);
+        aspect-ratio: 1;
+        background:
+            radial-gradient(ellipse 24% 20% at 50% 17%, rgba(255, 220, 155, 0.82) 0%, rgba(255, 197, 90, 0.52) 30%, rgba(255, 184, 65, 0.2) 62%, transparent 100%),
+            radial-gradient(ellipse 30% 24% at 24% 43%, rgba(255, 211, 126, 0.7) 0%, rgba(255, 190, 70, 0.44) 32%, rgba(255, 180, 55, 0.18) 64%, transparent 100%),
+            radial-gradient(ellipse 30% 24% at 76% 43%, rgba(255, 211, 126, 0.7) 0%, rgba(255, 190, 70, 0.44) 32%, rgba(255, 180, 55, 0.18) 64%, transparent 100%),
+            radial-gradient(ellipse 21% 27% at 50% 46%, rgba(255, 205, 110, 0.38) 0%, rgba(255, 188, 72, 0.22) 38%, rgba(255, 180, 55, 0.08) 68%, transparent 100%),
+            radial-gradient(ellipse 18% 28% at 50% 76%, rgba(255, 205, 110, 0.3) 0%, rgba(255, 188, 72, 0.16) 38%, rgba(255, 180, 55, 0.05) 68%, transparent 100%);
+        filter: blur(var(--hero-ambient-blur));
+        opacity: 0;
+        pointer-events: none;
+        transform: translate(-50%, -50%);
+        transform-origin: center;
+        transition: opacity 880ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .hero-visual-slot:has(.hero-tree-stage.is-illuminated)::before {
+        opacity: var(--hero-ambient-opacity);
+    }
+
+    .hero-tree-stage {
+        z-index: 1;
+        --hero-glow-near-blur: 14px;
+        --hero-glow-near-opacity: 0.35;
+        --hero-glow-near-scale: 1;
+        --hero-glow-mid-blur: 28px;
+        --hero-glow-mid-opacity: 0.32;
+        --hero-glow-mid-scale: 1.015;
+        --hero-glow-wide-blur: 52px;
+        --hero-glow-wide-opacity: 0.18;
+        --hero-glow-wide-scale: 1.025;
+    }
+
+    .hero-tree-glow,
+    .hero-tree-stage::before,
+    .hero-tree-stage::after {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0;
+        background: rgb(255 190 70);
+        -webkit-mask-image: url("assets/images/hero/CBS-HERO-U01-CROSS-TREE-RESPONSIVE-ON.png");
+        mask-image: url("assets/images/hero/CBS-HERO-U01-CROSS-TREE-RESPONSIVE-ON.png");
+        -webkit-mask-position: center;
+        mask-position: center;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        transform-origin: center;
+        transition: opacity 720ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .hero-tree-glow {
+        z-index: 0;
+        display: block;
+        border-radius: 0;
+        filter: blur(var(--hero-glow-wide-blur));
+        transform: scale(var(--hero-glow-wide-scale));
+    }
+
+    .hero-tree-stage::before {
+        content: "";
+        z-index: 1;
+        filter: blur(var(--hero-glow-mid-blur));
+        transform: scale(var(--hero-glow-mid-scale));
+    }
+
+    .hero-tree-stage::after {
+        content: "";
+        z-index: 2;
+        filter: blur(var(--hero-glow-near-blur));
+        transform: scale(var(--hero-glow-near-scale));
+    }
+
+    .hero-tree-image {
+        z-index: 3;
+    }
+
+    .hero-tree-stage.is-illuminated .hero-tree-glow {
+        opacity: var(--hero-glow-wide-opacity);
+    }
+
+    .hero-tree-stage.is-illuminated::before {
+        opacity: var(--hero-glow-mid-opacity);
+    }
+
+    .hero-tree-stage.is-illuminated::after {
+        opacity: var(--hero-glow-near-opacity);
+    }
+}
+
+@media (max-width: 560px) {
+    .hero-visual-slot {
+        --hero-ambient-blur: 48px;
+        --hero-ambient-opacity: 0.48;
+    }
+
+    .hero-visual-slot::before {
+        width: min(96vw, 22rem);
+    }
+
+    .hero-tree-stage {
+        --hero-glow-near-blur: 12px;
+        --hero-glow-near-opacity: 0.35;
+        --hero-glow-near-scale: 1;
+        --hero-glow-mid-blur: 23px;
+        --hero-glow-mid-opacity: 0.32;
+        --hero-glow-mid-scale: 1.018;
+        --hero-glow-wide-blur: 42px;
+        --hero-glow-wide-opacity: 0.18;
+        --hero-glow-wide-scale: 1.03;
+    }
+}
+
 button {
     margin-top: 2rem;
     background: var(--brand-yellow);
@@ -2206,7 +2439,39 @@ footer a:hover {
 @media (min-width: 768px) and (max-width: 1024px) {
     .panel-hero .overlay {
         width: min(100%, 52rem);
-        gap: clamp(0.8rem, 2vw, 1.35rem);
+        gap: 5rem;
+    }
+
+    .hero-copy {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .overlay h1,
+    .overlay p {
+        margin-left: auto;
+        margin-right: auto;
+        text-align: center;
+    }
+
+    .overlay h1::after {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .overlay h1 {
+        font-size: clamp(3.4rem, 6.8vw, 3.8rem);
+    }
+
+    .overlay p {
+        font-size: 1.35rem;
+    }
+
+    .hero-actions {
+        justify-content: center;
+        width: 100%;
     }
 
     .hero-visual-slot {
@@ -2214,16 +2479,16 @@ footer a:hover {
     }
 
     .hero-tree-stage {
-        width: min(100%, clamp(22rem, 68vw, 34rem), calc(100svh - 20rem));
+        width: min(100%, clamp(22rem, 72vw, 36rem), calc(100svh - 20rem));
     }
 
     #scrollBtn {
         position: relative;
         isolation: isolate;
         overflow: visible;
-        min-height: 3.35rem;
-        padding: 1.06rem 2.45rem;
-        font-size: 1.02rem;
+        min-height: 4rem;
+        padding: 1.25rem 2.8rem;
+        font-size: 1.2rem;
         --cta-orbit-angle: 0deg;
     }
 
@@ -2311,7 +2576,11 @@ footer a:hover {
     }
 
     .hero-tree-stage {
-        width: min(100%, clamp(22rem, 48vw, 30rem), calc(100svh - 13rem));
+        width: min(100%, clamp(22rem, 52vw, 32rem), calc(100svh - 13rem));
+    }
+
+    .overlay h1 {
+        font-size: 3.5rem;
     }
 }
 
@@ -2398,7 +2667,7 @@ footer a:hover {
     }
 
     .hero-tree-stage {
-        width: min(100%, clamp(13rem, 60vw, 20rem));
+        width: min(100%, clamp(13rem, 68vw, 22rem));
     }
 
     .format-flow {
@@ -2430,15 +2699,20 @@ footer a:hover {
 @media (min-width: 768px) and (max-width: 768px) {
     .panel-hero .overlay {
         width: min(100%, 52rem);
-        gap: clamp(0.8rem, 2vw, 1.35rem);
+        gap: 2rem;
+        padding-bottom: 3rem;
     }
 
     .hero-visual-slot {
-        min-height: min(clamp(23rem, 56vw, 34rem), calc(100svh - 18rem));
+        min-height: min(72vw, calc(100svh - 20rem));
     }
 
     .hero-tree-stage {
-        width: min(100%, clamp(22rem, 68vw, 34rem), calc(100svh - 20rem));
+        width: min(100%, clamp(20rem, 60vw, 30rem), calc(100svh - 20rem));
+    }
+
+    .overlay h1 {
+        font-size: 3.4rem;
     }
 }
 
@@ -2457,6 +2731,10 @@ footer a:hover {
         margin-left: auto;
         margin-right: auto;
         text-align: center;
+    }
+
+    .overlay h1 {
+        font-size: clamp(2.05rem, 8.8vw, 2.9rem);
     }
 
     .overlay h1::after {
@@ -3190,7 +3468,7 @@ footer a:hover {
 
 @media (max-width: 390px) {
     .overlay h1 {
-        font-size: 2.25rem;
+        font-size: 2.1rem;
     }
 
     .landing-panel:not(.panel-hero) {
@@ -3205,7 +3483,7 @@ footer a:hover {
     }
 
     .overlay h1 {
-        font-size: 2.15rem;
+        font-size: 2.05rem;
     }
 
     .social-buttons a,

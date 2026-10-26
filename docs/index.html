@@ -11,7 +11,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="shopify.css" />
-    <link rel="preload" as="image" href="assets/images/hero/CBS-HERO-U01-CROSS-TREE-GLOW.png" />
+    <link rel="preload" as="image" href="assets/images/hero/CBS-HERO-U01-CROSS-TREE-GLOW.png" media="(min-width: 1025px)" />
+    <link rel="preload" as="image" href="assets/images/hero/CBS-HERO-U01-CROSS-TREE-RESPONSIVE-ON.png" media="(max-width: 1024px)" />
     <script defer src="assets/js/vendor/gsap.min.js"></script>
     <script defer src="assets/js/vendor/ScrollTrigger.min.js"></script>
     <script defer src="script.js"></script>
@@ -63,25 +64,37 @@
             <div class="hero-visual-slot">
                 <figure class="hero-tree-stage" data-hero-tree>
                     <span class="hero-tree-glow" aria-hidden="true"></span>
-                    <img
-                        src="assets/images/hero/hero-holiday-cross-tree-off.png"
-                        alt="Holiday Cross Tree decorated with greenery and white draping"
-                        class="hero-tree-image hero-tree-image-off"
-                        width="1240"
-                        height="1269"
-                        fetchpriority="high"
-                        decoding="async"
-                    />
-                    <img
-                        src="assets/images/hero/CBS-HERO-U01-CROSS-TREE-GLOW.png"
-                        alt=""
-                        class="hero-tree-image hero-tree-image-on"
-                        width="1254"
-                        height="1254"
-                        loading="eager"
-                        decoding="async"
-                        aria-hidden="true"
-                    />
+                    <picture>
+                        <source
+                            media="(max-width: 1024px)"
+                            srcset="assets/images/hero/CBS-HERO-U01-CROSS-TREE-RESPONSIVE-OFF.png"
+                        />
+                        <img
+                            src="assets/images/hero/hero-holiday-cross-tree-off.png"
+                            alt="Holiday Cross Tree decorated with greenery and white draping"
+                            class="hero-tree-image hero-tree-image-off"
+                            width="1240"
+                            height="1269"
+                            fetchpriority="high"
+                            decoding="async"
+                        />
+                    </picture>
+                    <picture>
+                        <source
+                            media="(max-width: 1024px)"
+                            srcset="assets/images/hero/CBS-HERO-U01-CROSS-TREE-RESPONSIVE-ON.png"
+                        />
+                        <img
+                            src="assets/images/hero/CBS-HERO-U01-CROSS-TREE-GLOW.png"
+                            alt=""
+                            class="hero-tree-image hero-tree-image-on"
+                            width="1254"
+                            height="1254"
+                            loading="eager"
+                            decoding="async"
+                            aria-hidden="true"
+                        />
+                    </picture>
                 </figure>
             </div>
         </div>
