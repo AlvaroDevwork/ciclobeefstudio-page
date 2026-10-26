@@ -562,11 +562,12 @@ function componentOptions(product, signaturePresentation = null) {
         : usesTabletViewport
             ? {
                 "display": "block",
-                "min-width": "132px",
-                "min-height": "42px",
+                "font-size": "14px",
+                "min-width": "160px",
+                "min-height": "48px",
                 "margin-left": "auto",
                 "margin-right": "auto",
-                "padding": "11px 22px",
+                "padding": "13px 28px",
             }
             : {};
     const modalImageStyle = usesCompactViewport

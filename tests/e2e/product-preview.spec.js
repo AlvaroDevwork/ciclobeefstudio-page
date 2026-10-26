@@ -3,8 +3,23 @@ const { expect, test } = require("@playwright/test");
 async function checkProductPreview({ page }, testInfo) {
     await page.goto("/", { waitUntil: "domcontentloaded" });
     await page.locator("#products").scrollIntoViewIfNeeded();
-    await page.frameLocator(".shopify-buy-frame--product iframe").first()
-        .getByRole("button", { name: /buy now/i }).click();
+    const buyNow = page.frameLocator(".shopify-buy-frame--product iframe").first()
+        .getByRole("button", { name: /buy now/i });
+    await expect(buyNow).toBeVisible({ timeout: 40_000 });
+    if (testInfo.project.name === "tablet-ipad-chromium") {
+        const buttonGeometry = await buyNow.evaluate(node => {
+            const rect = node.getBoundingClientRect();
+            return {
+                width: rect.width,
+                height: rect.height,
+                fontSize: Number.parseFloat(getComputedStyle(node).fontSize),
+            };
+        });
+        expect(buttonGeometry.width).toBeGreaterThanOrEqual(160);
+        expect(buttonGeometry.height).toBeGreaterThanOrEqual(48);
+        expect(buttonGeometry.fontSize).toBeGreaterThanOrEqual(14);
+    }
+    await buyNow.click();
     const frame = page.frameLocator(".shopify-buy-frame--modal iframe");
     const panel = frame.locator(".shopify-buy__modal");
     const add = frame.getByRole("button", { name: /add to cart/i });
