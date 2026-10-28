@@ -1,31 +1,56 @@
-name: Deploy to GitHub Pages (manual via tag)
+name: Deploy to GitHub Pages (manual via commit SHA)
 
 on:
   workflow_dispatch:
     inputs:
-      release_tag:
-        description: 'Tag to deploy (e.g. v0.5.0)'
+      release_sha:
+        description: 'Exact 40-character commit SHA to deploy'
         required: true
         type: string
 
 permissions:
-  contents: write   
-  pages: write
-  id-token: write
+  contents: write
+
+concurrency:
+  group: ciclobeefstudio-production-pages
+  cancel-in-progress: false
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code at tag
-        uses: actions/checkout@v4
+      - name: Validate release commit SHA
+        shell: bash
+        env:
+          RELEASE_SHA: ${{ inputs.release_sha }}
+        run: |
+          if [[ ! "$RELEASE_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::release_sha must be an exact 40-character lowercase hexadecimal commit SHA"
+            exit 1
+          fi
+
+      - name: Checkout exact release commit
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
-          fetch-depth: 0
-          ref: refs/tags/${{ inputs.release_tag }}
+          fetch-depth: 1
+          persist-credentials: false
+          ref: ${{ inputs.release_sha }}
+
+      - name: Verify checked-out release commit
+        shell: bash
+        env:
+          RELEASE_SHA: ${{ inputs.release_sha }}
+        run: |
+          git cat-file -e "${RELEASE_SHA}^{commit}"
+          actual_sha="$(git rev-parse HEAD)"
+          if [[ "$actual_sha" != "$RELEASE_SHA" ]]; then
+            echo "::error::Checked-out commit $actual_sha does not match requested release_sha"
+            exit 1
+          fi
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: '3.12'
 
@@ -34,12 +59,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Build MkDocs site
-        run: mkdocs build
+      - name: Build MkDocs site (strict)
+        run: python -m mkdocs build --strict
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.1.0
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}   
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./site
           cname: ciclobeefstudio.com
