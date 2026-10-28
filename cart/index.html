@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Your Cart — CicloBeef Studio</title>
+    <meta name="robots" content="noindex,follow">
+    <link rel="canonical" href="https://ciclobeefstudio.com/cart/">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../shopify.css">
+    <link rel="stylesheet" href="../assets/css/cart-return.css">
+    <script type="module" src="../assets/js/commerce/cart-return.js"></script>
+</head>
+<body class="cbs-cart-return-page">
+    <header class="cbs-cart-return__header">
+        <a class="cbs-cart-return__brand" href="/" aria-label="CicloBeef Studio home">
+            <img src="../assets/images/ciclobeef-studio.png" alt="" width="42" height="42">
+            <span>CicloBeef Studio</span>
+        </a>
+        <a href="/#products">Studio Store</a>
+    </header>
+    <main class="cbs-cart-return__main">
+        <section class="cbs-cart-return__card" aria-labelledby="cart-return-title">
+            <h1 id="cart-return-title">Your Cart</h1>
+            <p class="cbs-cart-return__status" role="status" aria-live="polite" aria-atomic="true" data-cart-return-status>
+                Checking for your saved cart…
+            </p>
+            <p data-cart-return-fallback hidden>
+                <a class="cbs-cart-return__action" href="/#products">Continue to the Studio Store</a>
+            </p>
+        </section>
+    </main>
+    <footer class="cbs-cart-return__footer">
+        <span>© CicloBeef Studio</span>
+        <a href="/privacy/">Privacy</a>
+        <a href="/terms/">Terms</a>
+    </footer>
+</body>
+</html>
