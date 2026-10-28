@@ -16,6 +16,7 @@
     "qa:variant-composer-live": "node scripts/qa-variant-composer-live.mjs",
     "qa:variant-composer-static": "node scripts/qa-variant-composer-static.mjs",
     "qa:cart-regression": "node scripts/qa-cart-ui.mjs && node scripts/qa-cart-regression.mjs",
+    "qa:idempotency": "node --test tests/idempotency/*.test.mjs",
     "qa:e2e": "playwright test",
     "qa:e2e:cart": "playwright test tests/e2e/cart-runtime.spec.js",
     "qa:e2e:headed": "playwright test --headed"
