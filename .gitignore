@@ -25,5 +25,17 @@ Thumbs.db
 # Node local dependencies
 node_modules/
 
+# Playwright local tooling and QA artifacts
+.playwright-mcp/
+test-results/
+playwright-report/
+
+# Local forensic QA artifacts
+cart-forensic.png
+
+# Environment variants
+.env.*
+!.env.example
+
 # OS / misc
 *.log
