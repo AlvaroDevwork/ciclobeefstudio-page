@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "canonicalOrigin": "https://ciclobeefstudio.com",
+  "storefrontHostname": "ciclobeefstudio.com",
+  "cartReturnPath": "/cart/",
+  "defaultPathBehavior": "preserve",
+  "preservedPaths": ["/"],
+  "unlistedCommercePathsRequireReview": true,
+  "customerAccountIntegrationRequired": false,
+  "checkpointPreservationRequired": true,
+  "discountLinkPreservationRequired": true,
+  "officialTheme": {
+    "owner": "Shopify",
+    "repository": "Shopify/hydrogen-redirect-theme",
+    "commit": "1aa35ac9dfbab3a497d407c6e4df5e198412a8bc"
+  },
+  "customRedirects": [
+    { "source": "/cart", "target": "/cart/", "kind": "cart" },
+    { "source": "/search", "target": "/", "kind": "catalog" },
+    { "source": "/collections/all", "target": "/", "kind": "catalog" },
+    { "source": "/collections/frontpage", "target": "/", "kind": "catalog" },
+    { "source": "/products/cbs-signature-frame", "target": "/", "kind": "product" },
+    { "source": "/products/cbs-signature-acrylic", "target": "/", "kind": "product" },
+    { "source": "/products/plain-wooden-wall-cross-33-cm", "target": "/", "kind": "product" },
+    { "source": "/products/jesus-changed-my-life-hoodie", "target": "/", "kind": "product" },
+    { "source": "/products/cross-shaped-christmas-tree-150-180cm-pre-lit-warm-led-lights-artificial-pvc-xmas-tree-religious-holiday-home-outdoor-decoration", "target": "/", "kind": "product" },
+    { "source": "/products/13-in-1-star-projector-planetarium-galaxy-projector-for-bedroom-aurora-night-light-projector-for-kids-and-adults", "target": "/", "kind": "product" },
+    { "source": "/products/2-7m-christmas-garland-wreath-artificial-green-pine-rattan-xmas-tree-ornaments-for-home-party-door-fireplace-stair-decoration", "target": "/", "kind": "product" },
+    { "source": "/products/pe-pvc-artificial-christmas-tree-encryption-with-led-lights-large-christmas-tree-1-2m-to-2-4m-family-christmas-party-decorations", "target": "/", "kind": "product" },
+    { "source": "/products/home-decor-accessories-retro-world-globe-modern-learning-world-map-globe-kids-study-desk-decor-globe-geography-kids-education", "target": "/", "kind": "product" },
+    { "source": "/products/chinese-style-vintage-resin-horse-sculpture-home-decoration-for-bedrooms-studies-and-office-desks-art-collectibles", "target": "/", "kind": "product" },
+    { "source": "/products/european-style-horse-sculpture-resin-animal-statue-decoration-souvenir-gift-living-room-office-study-desktop-decoration", "target": "/", "kind": "product" },
+    { "source": "/products/nordic-ceramic-vase-solid-color-simple-art-flower-pot-decoration-with-small-bottleneck-for-table-shelf-dining-room", "target": "/", "kind": "product" },
+    { "source": "/products/european-style-home-resin-victory-horse-statue-living-room-cabinet-office-desktop-decoration-animal-figurines", "target": "/", "kind": "product" },
+    { "source": "/products/traditional-chinese-antique-bronze-zodiac-horse-statue-ornaments-home-living-room-desktop-chinese-style-decorative-crafts", "target": "/", "kind": "product" },
+    { "source": "/products/3pcs-bohemian-ceramic-vase-set-modern-bohemian-farmhouse-home-decoration-vase-living-room-bookshelf-dining-table-decoration", "target": "/", "kind": "product" },
+    { "source": "/products/minimalist-wooden-round-wall-clock-silent-living-room-decor-modern-simple-home-wall-watch-rustic-quiet-non-ticking-clock", "target": "/", "kind": "product" }
+  ]
+}

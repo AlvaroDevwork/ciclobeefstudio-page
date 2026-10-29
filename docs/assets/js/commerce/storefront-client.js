@@ -72,26 +72,48 @@ function assertMutationResult(result, operationName) {
 export function createStorefrontClient({
     config = STOREFRONT_CONFIG,
     fetchImpl = globalThis.fetch,
+    requestTimeoutMs = config.requestTimeoutMs,
 } = {}) {
     if (typeof fetchImpl !== "function") {
         throw new CommerceError(COMMERCE_ERROR_CODES.NETWORK_ERROR, "A fetch implementation is required.");
     }
+    if (!Number.isFinite(requestTimeoutMs) || requestTimeoutMs <= 0) {
+        throw new CommerceError(COMMERCE_ERROR_CODES.NETWORK_ERROR, "A positive Storefront request timeout is required.");
+    }
 
     async function request(query, variables, operationName) {
         let response;
+        const controller = new AbortController();
+        let timeoutId;
 
         try {
-            response = await fetchImpl(config.endpoint, {
-                method: "POST",
-                headers: {
-                    "Accept": "application/json",
-                    "Content-Type": "application/json",
-                    "X-Shopify-Storefront-Access-Token": config.publicAccessToken,
-                },
-                body: JSON.stringify({ query, variables, operationName }),
-            });
+            response = await Promise.race([
+                fetchImpl(config.endpoint, {
+                    method: "POST",
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                        "X-Shopify-Storefront-Access-Token": config.publicAccessToken,
+                    },
+                    body: JSON.stringify({ query, variables, operationName }),
+                    signal: controller.signal,
+                }),
+                new Promise((resolve, reject) => {
+                    timeoutId = setTimeout(() => {
+                        controller.abort();
+                        reject(new CommerceError(
+                            COMMERCE_ERROR_CODES.NETWORK_ERROR,
+                            `Commerce operation ${operationName} exceeded its request deadline.`,
+                            { details: { timeoutMs: requestTimeoutMs } },
+                        ));
+                    }, requestTimeoutMs);
+                }),
+            ]);
         } catch (error) {
+            if (error instanceof CommerceError) throw error;
             throw new CommerceError(COMMERCE_ERROR_CODES.NETWORK_ERROR, "The commerce service could not be reached.", { cause: error });
+        } finally {
+            clearTimeout(timeoutId);
         }
 
         if (!response.ok) {

@@ -71,10 +71,47 @@ function validateLineIds(lineIds) {
     return uniqueIds;
 }
 
-function validateCheckoutUrl(value) {
+function isShopifyGid(value, resource) {
+    const prefix = `gid://shopify/${resource}/`;
+    return typeof value === "string"
+        && value.startsWith(prefix)
+        && value.slice(prefix.length).trim().length > 0;
+}
+
+function validateCheckoutCart(cart) {
+    const lines = cart?.lines?.nodes;
+    const validLines = Array.isArray(lines)
+        && lines.length > 0
+        && lines.every(line => (
+            isShopifyGid(line?.id, "CartLine")
+            && Number.isInteger(line.quantity)
+            && line.quantity > 0
+            && isShopifyGid(line.merchandise?.id, "ProductVariant")
+        ));
+    const calculatedTotalQuantity = validLines
+        ? lines.reduce((total, line) => total + line.quantity, 0)
+        : 0;
+    if (
+        !validLines
+        || !Number.isInteger(cart.totalQuantity)
+        || cart.totalQuantity < 1
+        || cart.totalQuantity !== calculatedTotalQuantity
+    ) {
+        throw new CommerceError(COMMERCE_ERROR_CODES.INVALID_CART, "Checkout requires a non-empty cart with valid lines.");
+    }
+}
+
+function validateCheckoutUrl(value, approvedHosts) {
     try {
         const url = new URL(value);
-        if (url.protocol !== "https:" || url.username || url.password) {
+        const hosts = new Set(approvedHosts ?? []);
+        if (
+            url.protocol !== "https:"
+            || url.username
+            || url.password
+            || url.port
+            || !hosts.has(url.hostname)
+        ) {
             throw new Error("Unsafe checkout URL");
         }
         return url.href;
@@ -187,7 +224,8 @@ export function createCartManager({
             return enqueue(async () => {
                 const cart = await getCartInternal();
                 if (!cart) throw new CommerceError(COMMERCE_ERROR_CODES.INVALID_CART, "No active cart is available.");
-                return validateCheckoutUrl(cart.checkoutUrl);
+                validateCheckoutCart(cart);
+                return validateCheckoutUrl(cart.checkoutUrl, config.checkoutHosts);
             });
         },
         clearCartReference,

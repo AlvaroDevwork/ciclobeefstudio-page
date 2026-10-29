@@ -4,6 +4,11 @@ site_author: "CicloBeef Studio"
 
 docs_dir: docs
 site_dir: site
+exclude_docs: |
+  ai-log/**
+  audits/**
+  technical/**
+  business/ciclobeef-basic-landing-value-proposition.md
 
 nav:
   # MODIFIED: Landing is now the root page (docs/index.html). Docs entry moved here:

@@ -2,6 +2,7 @@ const SHOPIFY_DOMAIN = "8vatph-xn.myshopify.com";
 const PUBLIC_STOREFRONT_ACCESS_TOKEN = "32ab61c4c7e464fb88df4d131fe15b3c";
 const COMMERCE_QA_HOSTS = new Set(["127.0.0.1", "localhost"]);
 const COMMERCE_QA_QUERY_PARAMETER = "cbs-cart-qa";
+const CHECKOUT_HOSTS = Object.freeze(["shop.ciclobeefstudio.com"]);
 
 export function isLocalCommerceQaEnabled(locationRef = globalThis.location) {
     return Boolean(locationRef)
@@ -26,6 +27,8 @@ export const STOREFRONT_CONFIG = Object.freeze({
     apiVersion: "2026-10",
     endpoint: `https://${SHOPIFY_DOMAIN}/api/2026-10/graphql.json`,
     publicAccessToken: PUBLIC_STOREFRONT_ACCESS_TOKEN,
+    requestTimeoutMs: 15_000,
     cartStorageKey: "cbs.commerce.cart.v1",
     cartStorageVersion: 1,
+    checkoutHosts: CHECKOUT_HOSTS,
 });

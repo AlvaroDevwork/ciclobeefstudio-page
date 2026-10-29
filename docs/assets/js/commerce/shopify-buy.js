@@ -280,6 +280,80 @@ export async function getShopifyUi() {
     return uiPromise;
 }
 
+function buyButtonCheckoutStorageKey() {
+    return `${SHOPIFY_CONFIG.storefrontAccessToken}.${SHOPIFY_CONFIG.domain}.checkoutId`;
+}
+
+function readExistingCheckoutReference(storage) {
+    try {
+        const value = storage?.getItem(buyButtonCheckoutStorageKey());
+        return typeof value === "string" && value.trim().length > 0 && value.length <= 2048
+            ? value
+            : null;
+    } catch {
+        return null;
+    }
+}
+
+function waitForRestoredCart(ui, timeoutMs, pollIntervalMs) {
+    const deadline = Date.now() + Math.max(0, timeoutMs);
+
+    return new Promise(resolve => {
+        const inspect = () => {
+            const cart = ui?.components?.cart?.[0] ?? null;
+
+            if (cart?.model || Date.now() >= deadline) {
+                resolve(cart);
+                return;
+            }
+
+            window.setTimeout(inspect, pollIntervalMs);
+        };
+
+        inspect();
+    });
+}
+
+export async function openExistingShopifyCart({
+    storage = globalThis.localStorage,
+    documentRef = globalThis.document,
+    loadUi = getShopifyUi,
+    timeoutMs = 8_000,
+    pollIntervalMs = 50,
+} = {}) {
+    if (!readExistingCheckoutReference(storage)) {
+        return Object.freeze({ status: "missing", lineItemCount: 0 });
+    }
+
+    try {
+        const ui = await loadUi();
+        let cart = ui?.components?.cart?.[0] ?? null;
+
+        if (!cart) {
+            if (!documentRef?.body || typeof ui?.createComponent !== "function") {
+                return Object.freeze({ status: "unavailable", lineItemCount: 0 });
+            }
+
+            ui.createComponent("cart", {
+                node: documentRef.body,
+                options: componentOptions(null),
+            });
+            cart = await waitForRestoredCart(ui, timeoutMs, pollIntervalMs);
+        }
+
+        const lineItems = cart?.model?.lineItems;
+
+        if (!Array.isArray(lineItems) || lineItems.length === 0) {
+            return Object.freeze({ status: cart?.model ? "empty" : "unavailable", lineItemCount: 0 });
+        }
+
+        ui.openCart();
+        return Object.freeze({ status: "opened", lineItemCount: lineItems.length });
+    } catch {
+        return Object.freeze({ status: "unavailable", lineItemCount: 0 });
+    }
+}
+
 function getSignaturePresentation(product) {
     const presentation = product.group === "signature-art"
         ? product.presentation
