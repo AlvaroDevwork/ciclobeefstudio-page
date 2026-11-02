@@ -1,95 +1,127 @@
-# Privacy Policy
+# Privacy Policy – CicloBeef Studio
 
-_Last updated: June 30, 2026_
+_Last updated: November 1, 2026_
 
-CicloBeef Studio respects the privacy of its clients, collaborators and visitors.
+CicloBeef Studio respects the privacy of customers, visitors and people who contact us. This Privacy Policy explains, at a customer-facing level, what information we may process, why we use it, when it may be shared and the choices available to you.
 
-This page explains what personal data may be collected through our website, Instagram DM, Facebook Page DM, LinkedIn, email and order channels, how it may be used and which rights you have regarding your information.
+## 1. Information We May Collect
 
----
+### Information you provide
 
-## What Data We Collect
+Depending on how you interact with us, you may provide:
 
-Depending on the request, quote or contact channel, we may collect:
+- Name and contact details, such as email address and telephone number.
+- Billing, delivery and location information, such as country, region, city, postal code and shipping address.
+- Product selections, quantities, order details and transaction status.
+- Messages, customer-support requests, feedback and other communications.
+- Information needed to assess a cancellation, return, refund, damaged product or delivery issue.
 
-- Name and surname.
-- Email address and phone number, when provided or required for the order.
-- Country, region, city, postal code and shipping address.
-- Message content, artwork request, studio edition type, size, orientation, quantity and quote details.
-- Order information, payment status, delivery status and tracking information.
-- Communications sent by Instagram DM, Facebook Page DM, LinkedIn, email or other listed contact channels.
+Please do not send sensitive personal information or complete payment-card credentials by email, social media or general contact messages.
 
-We do **not** intentionally collect sensitive personal data through our public website.
+### Information generated through website use
 
----
+When you use the website, storefront or checkout, limited technical and usage information may be generated, such as:
 
-## How We Use Your Data
+- Internet Protocol address, browser, device type and operating-system information.
+- Pages or features used, referring information, timestamps and general interaction data.
+- Essential cookie, session or local-storage identifiers used to operate the website, cart, security or checkout.
+- Diagnostic, performance, fraud-prevention and security information.
 
-We may use the information you provide to:
+The precise information available may depend on your device, browser settings and the services used to provide the website and checkout.
 
-- Respond to inquiries, messages and collaboration proposals.
-- Prepare personalized quotes based on studio edition, format, destination, shipping and applicable order conditions.
-- Confirm orders and PayPal payment status.
-- Produce, print, fulfill and dispatch made-to-order studio editions.
-- Provide delivery updates, tracking information and customer support.
-- Investigate order issues, damaged studio editions, missing items or delivery problems.
-- Maintain legitimate commercial, accounting and support records.
+## 2. How We Use Information
 
-CicloBeef Studio uses internal records and operational tools to manage inventory, quotes and sales history. We do not publish internal spreadsheet names, formulas or system architecture in public documentation.
+We may process personal information to:
 
-We do **not** sell your data to third parties.
+- Operate the website, product catalog, cart and checkout.
+- Process orders, confirm payment status and maintain transaction records.
+- Prepare, produce, fulfill, ship and track purchases.
+- Respond to enquiries and provide customer support.
+- Manage cancellations, returns, refunds, damaged products and delivery issues.
+- Communicate service, order, security or policy updates.
+- Prevent fraud, misuse, unauthorized activity and security incidents.
+- Diagnose technical problems and maintain service reliability.
+- Comply with legal, tax, accounting, recordkeeping and dispute-resolution obligations.
+- Understand service performance and customer interactions where lawful analytics are used.
 
----
+We do not sell personal information in exchange for money.
 
-## Service Providers and External Channels
+## 3. Payments and Payment Information
 
-Only the data strictly necessary for an order or request may be shared with external providers.
+Payment information is processed through authorized third-party payment services such as **PayPal**. Eligible customers may also be offered credit card or debit card options through the PayPal checkout experience.
 
-This may include:
+CicloBeef Studio does not require customers to provide complete payment-card credentials directly to the studio when those credentials are handled by the payment processor. We may receive transaction information needed to manage an order, such as the payer’s name, contact or delivery details, payment status, amount, currency and transaction reference, but not the customer’s complete card number or security code from that processor flow.
 
-- External print, production and fulfillment providers, when needed to produce and deliver an order.
-- Shipping carriers and logistics providers, when needed for delivery and tracking.
-- Communication, storage, form and email providers, when those services are used for a specific request or order.
-- PayPal, when a customer approves a quote and receives a payment link for the final order total.
-- Instagram DM and Facebook Page DM, operated by Meta, when you contact CicloBeef Studio through those channels.
-- LinkedIn, when you use that channel for contracts, professional coordination or related administrative matters.
+Payment processors handle information under their own privacy notices, terms and security practices. The payment options and information requested may vary according to eligibility, location and transaction context.
 
-These providers may process data in countries other than your own. Because CicloBeef Studio may prepare and deliver orders internationally, personal data may be transferred or processed internationally for quoting, production, fulfillment, shipping, support and recordkeeping.
+## 4. Cookies, Essential Storage and Analytics
 
----
+The website and commerce services may use cookies or similar storage that is necessary to maintain sessions, remember a cart, support checkout, protect transactions, balance traffic or preserve security preferences.
 
-## Cookies and Analytics
+Service providers may also use cookies or similar technologies under their own notices. If optional analytics or other non-essential tracking is introduced where consent or additional notice is required, the relevant information and controls should be presented before or when that processing begins.
 
-The current public website repository does not show active CicloBeef Studio cookies or analytics tools. If those tools are added later, this policy should be updated before they are presented as active.
+You can use browser settings to restrict or delete cookies, although doing so may prevent the cart, checkout or other website features from working correctly.
 
-Third-party platforms that you choose to use, such as Instagram DM, Facebook Page DM, LinkedIn or PayPal, may apply their own privacy, cookie or analytics practices under their own policies.
+## 5. Service Providers and Information Sharing
 
----
+We may share only the information reasonably necessary with service providers that support the customer relationship, including categories such as:
 
-## Data Storage, Retention and Security
+- Commerce and website service providers.
+- Payment processors.
+- Production or fulfillment partners.
+- Shipping, logistics and delivery providers.
+- Customer-support, communications and email providers.
+- Hosting, security, diagnostics and analytics providers, where applicable.
+- Professional advisers or public authorities when disclosure is legally required or reasonably necessary to establish, exercise or defend legal rights.
 
-- Data may be stored in email systems, internal records, order documents and operational tools used by CicloBeef Studio.
-- We keep personal data only for as long as necessary to manage the relationship, prepare and complete orders, comply with legal obligations, resolve incidents and maintain legitimate business records.
-- We take reasonable technical and organizational measures to protect personal data; however, no method of transmission or storage is 100% secure.
+These parties may process information only for their services, legal obligations or other purposes described in their own applicable notices. We may also disclose information in connection with a lawful business reorganization, provided appropriate protections apply.
 
----
+## 6. International Processing
 
-## Your Rights
+Because orders and services may involve customers and providers in different countries, personal information may be processed outside your country of residence. Where required, we take reasonable steps to use appropriate contractual, organizational or legal safeguards for international processing.
 
-You may request:
+## 7. Data Retention
 
-- Access to the personal data we hold about you.
-- Correction of inaccurate or outdated information.
-- Deletion of your data from our records, unless we are legally required or otherwise allowed to keep it for legitimate purposes.
+We retain personal information only for as long as reasonably necessary for the purposes described in this policy, including to:
 
-To do so, please email us at:
+- Complete and support an order or customer relationship.
+- Maintain required commercial, tax, accounting and transaction records.
+- Resolve disputes, enforce agreements and respond to claims.
+- Prevent fraud and protect website or transaction security.
+- Meet applicable legal obligations.
 
-**ciclobeefstudio@gmail.com**
+Retention periods vary according to the type of information, the transaction, applicable law and whether an unresolved issue requires the information to be kept. When information is no longer required, we take reasonable steps to delete, anonymize or securely dispose of it.
 
----
+## 8. Security
 
-## Updates to This Policy
+We use reasonable technical and organizational measures designed to protect personal information against unauthorized access, loss, misuse, alteration or disclosure. Payment details handled by a payment processor are protected through that provider’s systems and practices.
 
-This policy may be updated as the project evolves, service providers change or legal requirements change.
+No internet transmission or storage method can be guaranteed to be completely secure. Customers should protect their accounts and devices and should contact us if they suspect unauthorized activity connected with an order or communication.
 
-Any significant update will be reflected on this page with a new revision date.
+## 9. Your Privacy Rights and Choices
+
+Depending on applicable law, you may have rights to:
+
+- Request access to personal information associated with you.
+- Request correction of inaccurate or incomplete information.
+- Request deletion of information when continued retention is not required or permitted.
+- Object to or request restriction of certain processing.
+- Request portability of eligible information.
+- Withdraw consent where processing relies on consent, without affecting earlier lawful processing.
+- Complain to an applicable data-protection authority.
+
+These rights may be subject to lawful exceptions, identity verification and record-retention requirements. To make a request, contact us using the address below and describe the request clearly. We will use the information necessary to verify and respond to it.
+
+## 10. Third-Party Links and Services
+
+The website may link to or operate with third-party services. Their privacy practices are governed by their own notices, and we encourage you to review those notices before providing information directly to them.
+
+## 11. Changes to This Policy
+
+We may update this policy to reflect changes in services, commercial practices, legal requirements or privacy standards. The current version and revision date will be published on this page. Where required, significant changes will be communicated through an appropriate additional notice.
+
+## 12. Contact
+
+For privacy questions or requests, contact:
+
+**[contact@ciclobeefstudio.com](mailto:contact@ciclobeefstudio.com)**
