@@ -279,6 +279,19 @@ function initCategorySwitcher() {
     const tabs = Array.from(document.querySelectorAll("[data-store-tab]"));
     const panels = Array.from(document.querySelectorAll("[data-store-panel]"));
 
+    const syncCategoryPositions = index => {
+        tabs.forEach((tab, tabIndex) => {
+            const position = tabIndex === index
+                ? "active"
+                : tabIndex === index - 1
+                    ? "previous"
+                    : tabIndex === index + 1
+                        ? "next"
+                        : "hidden";
+            tab.dataset.mobilePosition = position;
+        });
+    };
+
     const activate = (index, moveFocus = false) => {
         tabs.forEach((tab, tabIndex) => {
             const selected = tabIndex === index;
@@ -291,6 +304,7 @@ function initCategorySwitcher() {
         if (moveFocus) {
             tabs[index].focus();
         }
+        syncCategoryPositions(index);
         window.requestAnimationFrame(() => updatePager(panels[index]));
     };
 
@@ -309,6 +323,9 @@ function initCategorySwitcher() {
             activate(targetIndex, true);
         });
     });
+
+    const selectedIndex = Math.max(0, tabs.findIndex(tab => tab.getAttribute("aria-selected") === "true"));
+    syncCategoryPositions(selectedIndex);
 }
 
 function linkProductReferences() {
