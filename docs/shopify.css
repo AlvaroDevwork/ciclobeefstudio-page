@@ -108,6 +108,13 @@ body.cbs-cart-is-open {
     box-shadow: 0 12px 34px rgba(0, 0, 0, 0.22);
 }
 
+@media (max-width: 1024px), (max-width: 1366px) and (hover: none) and (pointer: coarse) {
+    .shopify-buy-frame--toggle:focus,
+    .shopify-buy-frame--toggle:focus-visible {
+        outline: none;
+    }
+}
+
 @media (min-width: 1025px) {
     .shopify-buy-frame--toggle {
         top: calc(var(--cbs-header-inset) + env(safe-area-inset-top) + 1.5rem) !important;
@@ -933,6 +940,10 @@ body.cbs-composer-is-open {
 }
 
 @media (min-width: 1181px) and (hover: hover) and (pointer: fine) {
+    #products.cbs-store {
+        --cbs-store-action-graphite: #686868;
+    }
+
     .cbs-store-group__toolbar {
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
@@ -1152,6 +1163,15 @@ body.cbs-composer-is-open {
 }
 
 @media (min-width: 1025px) and (hover: hover) and (pointer: fine) {
+    .cbs-store-pager,
+    .cbs-store-track {
+        transform: translateY(-0.35rem);
+    }
+
+    .cbs-store-track:not(:has(> .cbs-product-card:nth-child(4))) {
+        justify-content: center;
+    }
+
     .cbs-product-card__body {
         grid-template-rows: auto auto;
         align-content: start;
@@ -1160,13 +1180,15 @@ body.cbs-composer-is-open {
 
     .cbs-product-card__body h4 {
         height: 2.5em;
+        font-family: Georgia, 'Times New Roman', serif;
+        font-style: normal;
         -webkit-line-clamp: 2;
     }
 
     .cbs-product-card__commerce {
         align-self: start;
         padding-top: 0.15rem;
-        transform: none;
+        transform: translateY(-0.4rem);
     }
 }
 
@@ -1338,6 +1360,7 @@ body.cbs-composer-is-open {
        (min-width: 641px) and (max-width: 1366px) and (hover: none) and (pointer: coarse) {
     #products.cbs-store,
     #products.cbs-store.landing-panel {
+        --cbs-store-touch-action-graphite: #4a4a4a;
         --cbs-store-tablet-block-gap: clamp(1rem, 2.2svh, 1.5rem);
         padding-top: calc(var(--cbs-header-offset) + var(--cbs-store-tablet-block-gap));
         padding-bottom: var(--cbs-store-tablet-block-gap);
@@ -1388,9 +1411,9 @@ body.cbs-composer-is-open {
         position: absolute;
         inset: -0.22rem 0;
         z-index: -1;
-        border: 1px solid rgba(54, 54, 54, 0.72);
+        border: 1px solid var(--cbs-store-touch-action-graphite);
         border-radius: 8px;
-        background: rgba(54, 54, 54, 0.72);
+        background: var(--cbs-store-touch-action-graphite);
         opacity: 0;
         transform: scale(0.96);
         transition: opacity 160ms ease, transform 160ms ease;
@@ -1480,6 +1503,22 @@ body.cbs-composer-is-open {
     }
 }
 
+@media (min-width: 1024px) and (max-width: 1366px) and (hover: none) and (pointer: coarse) {
+    #products.cbs-store .cbs-store-tab {
+        flex-basis: 12.5rem;
+        width: 12.5rem;
+        padding: 0.38rem 0.2rem 0.44rem;
+    }
+
+    #products.cbs-store .cbs-store-tab__label {
+        font-size: 1rem;
+    }
+
+    #products.cbs-store .cbs-store-tab__label::after {
+        inset: -0.3rem 0;
+    }
+}
+
 @media (max-width: 900px) {
     .cbs-store-track {
         --cbs-store-visible-cards: 2;
@@ -1537,19 +1576,111 @@ body.cbs-composer-is-open {
 
 @media (max-width: 640px) {
     #products.cbs-store {
+        --cbs-store-side-cue-graphite: #686868;
+        --cbs-store-touch-action-graphite: #4a4a4a;
         --cbs-catalog-image-aspect-ratio: 8 / 5;
         --cbs-catalog-media-scale: 78%;
         --cbs-catalog-safe-inset: 0.45rem;
     }
 
-    .cbs-store-tab {
-        flex-basis: 11rem;
+    #products.cbs-store .cbs-store-tabs {
+        justify-content: center;
+        gap: 0.25rem;
+        width: min(100%, 14.25rem);
+        margin-inline: auto;
+        padding-inline: 0;
+        overflow-x: visible;
+        scroll-snap-type: none;
+    }
+
+    #products.cbs-store .cbs-store-tab {
+        flex: 0 0 auto;
+        padding: 0;
+        border-color: transparent;
+        background: transparent;
+        scroll-snap-align: none;
+    }
+
+    #products.cbs-store .cbs-store-tab:hover,
+    #products.cbs-store .cbs-store-tab:focus-visible,
+    #products.cbs-store .cbs-store-tab[aria-selected="true"] {
+        background: transparent;
+    }
+
+    #products.cbs-store .cbs-store-tab__label {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        width: min(9.75rem, calc(100vw - 6rem));
+        min-height: 2.75rem;
+        padding: 0.4rem 0.65rem;
+        border: 1px solid transparent;
+        border-radius: 8px;
+    }
+
+    #products.cbs-store .cbs-store-tab[aria-selected="true"] .cbs-store-tab__label {
+        border-color: rgba(54, 54, 54, 0.38);
+        background: var(--cbs-store-touch-action-graphite);
+    }
+
+    #products.cbs-store .cbs-store-tab[data-mobile-position="previous"],
+    #products.cbs-store .cbs-store-tab[data-mobile-position="next"] {
+        width: 2rem;
+        min-height: 2.75rem;
+        padding: 0;
+    }
+
+    #products.cbs-store .cbs-store-tab[data-mobile-position="previous"] .cbs-store-tab__label,
+    #products.cbs-store .cbs-store-tab[data-mobile-position="next"] .cbs-store-tab__label {
+        width: 1.125rem;
+        min-height: 2.25rem;
+        padding: 0;
+        border: 1px solid rgba(26, 26, 26, 0.26);
+        border-radius: 999px;
+        overflow: hidden;
+        background: var(--cbs-store-side-cue-graphite);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 0 0 rgba(104, 104, 104, 0);
+        color: transparent;
+        font-size: 0;
+        transform-origin: center;
+        animation: cbs-store-mobile-navigation-cue 2.4s ease-in-out infinite;
+        transition: transform 140ms ease, filter 140ms ease;
+    }
+
+    #products.cbs-store .cbs-store-tab[data-mobile-position="next"] .cbs-store-tab__label {
+        animation-delay: -1.2s;
+    }
+
+    #products.cbs-store .cbs-store-tab[data-mobile-position="previous"]:active .cbs-store-tab__label,
+    #products.cbs-store .cbs-store-tab[data-mobile-position="next"]:active .cbs-store-tab__label {
+        opacity: 1;
+        transform: scale(0.92);
+        filter: saturate(1.08) brightness(0.96);
+        animation: none;
+    }
+
+    #products.cbs-store .cbs-store-tab[data-mobile-position="hidden"] {
+        display: none;
+    }
+
+    #products.cbs-store .cbs-store-tab:focus-visible {
+        outline: none;
+    }
+
+    #products.cbs-store .cbs-store-tab:focus-visible .cbs-store-tab__label {
+        outline: 3px solid var(--brand-yellow);
+        outline-offset: 2px;
     }
 
     .cbs-store-group__toolbar {
         display: flex;
         justify-content: center;
         gap: 0.65rem;
+    }
+
+    #products.cbs-store .cbs-store-group:not([hidden]) {
+        animation: cbs-store-mobile-panel-enter 240ms cubic-bezier(0.22, 0.72, 0.28, 1) both;
     }
 
     .cbs-store-pager {
@@ -1606,6 +1737,62 @@ body.cbs-composer-is-open {
     }
 }
 
+@keyframes cbs-store-mobile-navigation-cue {
+    0%,
+    100% {
+        opacity: 0.86;
+        filter: brightness(0.94);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 0 0 rgba(104, 104, 104, 0);
+    }
+
+    50% {
+        opacity: 1;
+        filter: brightness(1.08);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42), 0 0 0 rgba(104, 104, 104, 0);
+    }
+}
+
+@keyframes cbs-store-mobile-panel-enter {
+    from {
+        opacity: 0.76;
+        transform: translateY(0.3rem);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Keep the existing card geometry; center the title between media and button.
+   Include the commerce translation and the Buy Button wrapper's 20px top margin. */
+@media (max-width: 1024px), (max-width: 1366px) and (hover: none) and (pointer: coarse) {
+    #products .cbs-product-card__body h4 {
+        display: flex;
+        align-self: center;
+        align-items: center;
+        justify-content: center;
+        font-family: Georgia, 'Times New Roman', serif;
+        font-weight: 400;
+        font-style: normal;
+        text-wrap: balance;
+        transform: translateY(calc((-0.15rem + 21px - 0.3rem - clamp(0.5rem, 1svh, 0.7rem)) / 2));
+    }
+}
+
+@media (min-width: 901px) and (max-width: 1024px),
+       (min-width: 901px) and (max-width: 1366px) and (hover: none) and (pointer: coarse) {
+    #products .cbs-product-card__body h4 {
+        transform: translateY(calc((-0.15rem + 21px - 0.65rem - clamp(0.5rem, 1svh, 0.7rem)) / 2));
+    }
+}
+
+@media (max-width: 640px) {
+    #products .cbs-product-card__body h4 {
+        transform: translateY(calc((-0.2rem + 21px - 0.3rem) / 2));
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     .cbs-store-track {
         scroll-behavior: auto;
@@ -1619,6 +1806,17 @@ body.cbs-composer-is-open {
     .cbs-product-card:hover,
     .cbs-product-card:focus-within {
         transform: none;
+    }
+
+    #products.cbs-store .cbs-store-tab[data-mobile-position="previous"] .cbs-store-tab__label,
+    #products.cbs-store .cbs-store-tab[data-mobile-position="next"] .cbs-store-tab__label {
+        opacity: 1;
+        transform: none;
+        animation: none;
+    }
+
+    #products.cbs-store .cbs-store-group:not([hidden]) {
+        animation: none;
     }
 }
 
