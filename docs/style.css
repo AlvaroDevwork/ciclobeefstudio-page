@@ -260,12 +260,12 @@ a {
         width: min(52vw, 42rem);
         aspect-ratio: 1;
         background:
-            radial-gradient(ellipse 24% 18% at 50% 20%, rgba(255, 220, 155, 0.84) 0%, rgba(255, 197, 90, 0.64) 30%, rgba(255, 184, 65, 0.28) 64%, transparent 100%),
+            radial-gradient(ellipse 24% 20% at 50% 18%, rgba(255, 220, 155, 0.84) 0%, rgba(255, 197, 90, 0.64) 30%, rgba(255, 184, 65, 0.28) 64%, transparent 100%),
             radial-gradient(ellipse 31% 25% at 24% 40%, rgba(255, 211, 126, 0.9) 0%, rgba(255, 190, 70, 0.68) 32%, rgba(255, 180, 55, 0.3) 66%, transparent 100%),
             radial-gradient(ellipse 31% 25% at 76% 40%, rgba(255, 211, 126, 0.9) 0%, rgba(255, 190, 70, 0.68) 32%, rgba(255, 180, 55, 0.3) 66%, transparent 100%),
             radial-gradient(ellipse 22% 26% at 50% 44%, rgba(255, 205, 110, 0.55) 0%, rgba(255, 188, 72, 0.38) 38%, rgba(255, 180, 55, 0.16) 70%, transparent 100%),
             radial-gradient(ellipse 21% 28% at 50% 63%, rgba(255, 205, 110, 0.78) 0%, rgba(255, 188, 72, 0.52) 38%, rgba(255, 180, 55, 0.24) 70%, transparent 100%),
-            radial-gradient(ellipse 26% 16% at 50% 64%, rgb(255 220 155) 0%, rgba(255, 196, 82, 0.98) 34%, rgba(255, 180, 48, 0.78) 62%, rgba(255, 170, 32, 0.35) 82%, transparent 100%);
+            radial-gradient(ellipse 26% 18% at 50% 66%, rgb(255 220 155) 0%, rgba(255, 196, 82, 0.98) 34%, rgba(255, 180, 48, 0.78) 62%, rgba(255, 170, 32, 0.35) 82%, transparent 100%);
         filter: blur(var(--hero-ambient-blur));
         opacity: 0;
         pointer-events: none;
@@ -2436,6 +2436,73 @@ footer a:hover {
     }
 }
 
+@media (min-width: 1025px) {
+    #scrollBtn {
+        position: relative;
+        isolation: isolate;
+        overflow: visible;
+        --cta-orbit-angle: 0deg;
+    }
+
+    #scrollBtn::before {
+        content: "";
+        position: absolute;
+        inset: 3px;
+        z-index: 1;
+        border-radius: inherit;
+        background:
+            conic-gradient(from var(--cta-orbit-angle), transparent 0deg 250deg, rgba(255, 195, 0, 0.14) 264deg, rgba(255, 220, 96, 0.54) 278deg, rgba(255, 255, 246, 1) 288deg, rgba(255, 195, 0, 0.78) 296deg, rgba(255, 195, 0, 0.2) 312deg, transparent 328deg 360deg) border-box;
+        opacity: 0.98;
+        padding: 1.5px;
+        pointer-events: none;
+        filter:
+            drop-shadow(0 0 6px rgba(255, 220, 96, 0.62))
+            drop-shadow(0 0 14px rgba(255, 195, 0, 0.32));
+        -webkit-mask:
+            linear-gradient(#000 0 0) content-box,
+            linear-gradient(#000 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        animation: desktopCtaLightPoint 3.9s linear infinite;
+    }
+
+    #scrollBtn::after {
+        content: "";
+        position: absolute;
+        inset: 3px;
+        z-index: 0;
+        border-radius: inherit;
+        border: 1px solid rgba(255, 217, 96, 0.34);
+        box-shadow:
+            inset 0 0 8px rgba(255, 235, 150, 0.2),
+            inset 0 0 0 1px rgba(138, 101, 0, 0.08);
+        opacity: 0.56;
+        pointer-events: none;
+    }
+
+    #scrollBtn:hover {
+        transform: scale(1.04);
+    }
+
+    @keyframes desktopCtaLightPoint {
+        100% {
+            --cta-orbit-angle: 360deg;
+        }
+    }
+}
+
+@media (min-width: 1025px) and (prefers-reduced-motion: reduce) {
+    #scrollBtn::before {
+        --cta-orbit-angle: 42deg;
+        animation: none;
+        opacity: 0.94;
+    }
+
+    #scrollBtn::after {
+        opacity: 0.44;
+    }
+}
+
 @media (min-width: 768px) and (max-width: 1024px) {
     .panel-hero .overlay {
         width: min(100%, 52rem);
@@ -4063,6 +4130,24 @@ footer a:hover {
     #contact .cbs-scene__contact-card p {
         max-width: 30rem;
         text-wrap: balance;
+    }
+}
+
+@media (min-width: 901px) and (min-height: 701px) and (hover: hover) and (pointer: fine) {
+    #contact .cbs-scene__heading > h2 {
+        margin-top: calc(clamp(3.25rem, 6svh, 4.5rem) + 4px);
+    }
+}
+
+@media (min-width: 901px) and (hover: hover) and (pointer: fine) {
+    #contact .cbs-scene__heading > h2 {
+        position: relative;
+        top: 16px;
+    }
+
+    #contact .cbs-scene__contact,
+    #contact .cbs-scene__social-block {
+        margin-top: 3rem;
     }
 }
 
