@@ -798,6 +798,35 @@ body.cbs-composer-is-open {
     margin-inline: auto;
 }
 
+.studio-store-payment-badge {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin: clamp(0.75rem, 1.8svh, 1.2rem) auto 0;
+}
+
+.studio-store-payment-badge img {
+    display: block;
+    width: 300px;
+    max-width: 100%;
+    height: auto;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+@media (max-width: 1024px), (max-width: 1366px) and (hover: none) and (pointer: coarse) {
+    .studio-store-payment-badge img {
+        width: 260px;
+    }
+}
+
+@media (max-width: 640px) {
+    .studio-store-payment-badge img {
+        width: 220px;
+    }
+}
+
 .cbs-store-tabs {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 11rem));
@@ -1830,4 +1859,199 @@ body.cbs-composer-is-open {
         gap: 0.75rem;
     }
 
+}
+
+/* Keep the complete Studio Store composition within one viewport where the
+   payment badge needs additional room. iPad Air/Pro touch layouts are excluded. */
+@media (min-width: 769px) and (hover: hover) and (pointer: fine) {
+    #products.cbs-store {
+        --cbs-catalog-image-aspect-ratio: 1.75 / 1;
+        --cbs-catalog-media-scale: 78%;
+        padding-top: calc(var(--cbs-header-offset) + clamp(0.45rem, 1svh, 0.75rem));
+        padding-bottom: clamp(0.75rem, 1.5svh, 1.1rem);
+    }
+
+    #products.cbs-store .section-inner {
+        gap: clamp(0.35rem, 0.8svh, 0.6rem);
+    }
+
+    #products.cbs-store .cbs-store__header .section-title {
+        margin-bottom: 0.15rem;
+    }
+
+    #products.cbs-store .cbs-store__header,
+    #products.cbs-store .cbs-store-tabs {
+        transform: translateY(clamp(0.75rem, 1.6svh, 1rem));
+    }
+
+    #products.cbs-store .cbs-store__catalog {
+        gap: clamp(0.4rem, 0.9svh, 0.65rem);
+    }
+
+    #products.cbs-store .cbs-store-tabs {
+        grid-template-columns: repeat(3, minmax(0, 9.5rem));
+        padding-block: 0.15rem;
+    }
+
+    #products.cbs-store .cbs-store-tab {
+        flex-basis: 9.5rem;
+        width: 9.5rem;
+        min-height: 2.3rem;
+        padding: 0.28rem 0.5rem;
+    }
+
+    #products.cbs-store .cbs-store-tab__label {
+        font-size: clamp(0.75rem, 0.95vw, 0.84rem);
+        font-weight: 400;
+        white-space: nowrap;
+    }
+
+    #products.cbs-store .cbs-store-group__toolbar {
+        margin-bottom: clamp(0.25rem, 0.6svh, 0.45rem);
+    }
+
+    #products.cbs-store .cbs-store-pager {
+        transform: translateY(clamp(0.15rem, 0.4svh, 0.25rem));
+    }
+
+    #products.cbs-store .cbs-store-track {
+        padding-bottom: 0.35rem;
+        transform: translateY(clamp(0.5rem, 1svh, 0.7rem));
+    }
+
+    #products.cbs-store .studio-store-payment-badge {
+        margin-top: clamp(0.2rem, 0.5svh, 0.4rem);
+    }
+
+    #products.cbs-store .studio-store-payment-badge img {
+        width: 240px;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 819px) and (hover: none) and (pointer: coarse) {
+    #products.cbs-store,
+    #products.cbs-store.landing-panel {
+        --cbs-catalog-image-aspect-ratio: 2 / 1;
+        --cbs-catalog-media-scale: 76%;
+        --cbs-store-tablet-block-gap: clamp(0.6rem, 1.4svh, 0.9rem);
+        padding-bottom: var(--cbs-store-tablet-block-gap);
+    }
+
+    #products.cbs-store .section-inner {
+        min-height: 0;
+        gap: clamp(0.4rem, 0.9svh, 0.65rem);
+    }
+
+    #products.cbs-store .cbs-store__header .section-title {
+        margin-bottom: 0.15rem;
+    }
+
+    #products.cbs-store .cbs-store__catalog {
+        gap: clamp(0.45rem, 1svh, 0.7rem);
+    }
+
+    #products.cbs-store .cbs-store-track {
+        width: min(100%, 56svh);
+        padding-bottom: 0.4rem;
+    }
+
+    #products.cbs-store .studio-store-payment-badge {
+        margin-top: clamp(0.25rem, 0.6svh, 0.45rem);
+    }
+
+    #products.cbs-store .studio-store-payment-badge img {
+        width: 220px;
+    }
+}
+
+@media (min-width: 760px) and (max-width: 780px) and (min-height: 960px) and (max-height: 1100px) and (hover: none) and (pointer: coarse),
+       (min-width: 960px) and (max-width: 1100px) and (min-height: 740px) and (max-height: 790px) and (hover: none) and (pointer: coarse) {
+    #products.cbs-store,
+    #products.cbs-store.landing-panel {
+        --cbs-catalog-image-aspect-ratio: 1.75 / 1;
+        --cbs-catalog-media-scale: 84%;
+    }
+
+    #products.cbs-store .cbs-store-tab {
+        flex-basis: 12rem;
+        width: 12rem;
+    }
+
+    #products.cbs-store .cbs-store-tab__label {
+        font-size: 0.95rem;
+    }
+
+    #products.cbs-store .cbs-product-card__body h4 {
+        font-size: 1.35rem;
+  }
+}
+
+/* iPad mini portrait: center the complete store grid without changing its viewport. */
+@media (min-width: 760px) and (max-width: 780px) and (min-height: 960px) and (max-height: 1100px) and (hover: none) and (pointer: coarse) {
+    #products.cbs-store .section-inner {
+        transform: translateY(0.85rem);
+    }
+}
+
+@media (max-width: 640px) {
+    #products.cbs-store,
+    #products.cbs-store.landing-panel {
+        --cbs-catalog-image-aspect-ratio: 1.72 / 1;
+        --cbs-catalog-media-scale: 88%;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+
+    #products.cbs-store .section-inner {
+        grid-template-rows: repeat(3, max-content);
+        min-height: 100svh;
+        min-height: 100dvh;
+        align-content: center;
+        gap: clamp(0.3rem, 0.7svh, 0.5rem);
+        padding-top: clamp(3.75rem, 8svh, 5rem);
+    }
+
+    #products.cbs-store .cbs-store__header .section-title {
+        margin-bottom: 0.1rem;
+        font-size: clamp(1.45rem, 6vw, 1.7rem);
+    }
+
+    #products.cbs-store .cbs-store__catalog {
+        gap: clamp(0.35rem, 0.8svh, 0.55rem);
+    }
+
+    #products.cbs-store .cbs-store-tabs {
+        padding-block: 0.1rem;
+    }
+
+    #products.cbs-store .cbs-store-tab__label {
+        min-height: 2.4rem;
+        padding-block: 0.25rem;
+    }
+
+    #products.cbs-store .cbs-store-group__toolbar {
+        margin-bottom: clamp(0.2rem, 0.5svh, 0.35rem);
+    }
+
+    #products.cbs-store .cbs-store-track {
+        width: min(100%, 48svh);
+        margin-inline: auto;
+        padding-bottom: 0.3rem;
+    }
+
+    #products.cbs-store .cbs-product-card__body {
+        padding-top: 0.65rem;
+    }
+
+    #products.cbs-store .cbs-product-card__commerce {
+        transform: translateY(0.2rem);
+    }
+
+    #products.cbs-store .studio-store-payment-badge {
+        margin-top: 2.5rem;
+    }
+
+    #products.cbs-store .studio-store-payment-badge img {
+        width: 165px;
+    }
 }
