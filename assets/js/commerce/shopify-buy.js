@@ -1,4 +1,5 @@
 import { SHOPIFY_CONFIG } from "./config.js";
+import { enhanceModalOptionSelectors } from "./modal-option-selectors.js";
 
 let sdkPromise = null;
 let client = null;
@@ -126,8 +127,16 @@ function formatModalTypography(documentRef) {
         titleNode.style.fontWeight = "400";
     });
 
-    documentRef.querySelectorAll("[data-element='product.price']").forEach(priceNode => {
-        if (priceNode.querySelector(".cbs-modal-price__decimals")) {
+    formatPriceDecimals(
+        documentRef,
+        "[data-element='product.price']",
+        "cbs-modal-price__decimals",
+    );
+}
+
+function formatPriceDecimals(documentRef, selector, decimalsClass) {
+    documentRef.querySelectorAll(selector).forEach(priceNode => {
+        if (priceNode.querySelector(`.${decimalsClass}`)) {
             return;
         }
 
@@ -143,7 +152,7 @@ function formatModalTypography(documentRef) {
         priceNode.style.lineHeight = "16.8px";
 
         const decimals = documentRef.createElement("span");
-        decimals.className = "cbs-modal-price__decimals";
+        decimals.className = decimalsClass;
         decimals.textContent = priceParts[2];
         decimals.style.fontSize = "0.64em";
         decimals.style.fontWeight = "400";
@@ -159,6 +168,14 @@ function formatModalTypography(documentRef) {
     });
 }
 
+function formatCartTypography(documentRef) {
+    formatPriceDecimals(
+        documentRef,
+        ".shopify-buy__cart-item__price, [data-element='cart.subtotal']",
+        "cbs-cart-price__decimals",
+    );
+}
+
 function enhanceModalTypography(attempt = 0) {
     const modalFrame = document.querySelector(".shopify-buy-frame--modal iframe");
     const modalDocument = modalFrame?.contentDocument;
@@ -171,6 +188,7 @@ function enhanceModalTypography(attempt = 0) {
     }
 
     formatModalTypography(modalDocument);
+    enhanceModalOptionSelectors(modalDocument);
 
     if (modalDocument.documentElement.dataset.cbsTypographyObserver === "true") {
         return;
@@ -182,6 +200,34 @@ function enhanceModalTypography(attempt = 0) {
         renderSignatureMaterialSelector();
     });
     observer.observe(modalDocument.body, {
+        childList: true,
+        characterData: true,
+        subtree: true,
+    });
+}
+
+function enhanceCartTypography(attempt = 0) {
+    const cartFrame = document.querySelector(".shopify-buy-frame--cart iframe");
+    const cartDocument = cartFrame?.contentDocument;
+
+    if (!cartDocument?.body) {
+        if (attempt < 12) {
+            window.requestAnimationFrame(() => enhanceCartTypography(attempt + 1));
+        }
+        return;
+    }
+
+    formatCartTypography(cartDocument);
+
+    if (cartDocument.documentElement.dataset.cbsTypographyObserver === "true") {
+        return;
+    }
+
+    cartDocument.documentElement.dataset.cbsTypographyObserver = "true";
+    const observer = new cartDocument.defaultView.MutationObserver(() => {
+        formatCartTypography(cartDocument);
+    });
+    observer.observe(cartDocument.body, {
         childList: true,
         characterData: true,
         subtree: true,
@@ -626,22 +672,66 @@ function componentOptions(product, signaturePresentation = null) {
     const usesTabletViewport = window.matchMedia(
         "(min-width: 641px) and (max-width: 1180px), (min-width: 641px) and (max-width: 1366px) and (hover: none) and (pointer: coarse)",
     ).matches;
+    const usesIPadProViewport = window.matchMedia(
+        "(min-width: 1024px) and (max-width: 1366px) and (hover: none) and (pointer: coarse)",
+    ).matches;
+    const usesIPadMiniViewport = window.matchMedia(
+        "(min-width: 760px) and (max-width: 780px) and (min-height: 960px) and (max-height: 1100px) and (hover: none) and (pointer: coarse), (min-width: 960px) and (max-width: 1100px) and (min-height: 740px) and (max-height: 790px) and (hover: none) and (pointer: coarse)",
+    ).matches;
+    const usesTouchStoreActions = window.matchMedia("(max-width: 640px)").matches || usesTabletViewport;
+    const usesDesktopCommerceSurface = usesDesktopNavigation
+        && window.matchMedia("(min-width: 1181px)").matches;
+    const usesGraphiteCommerceSurface = usesCompactViewport
+        || usesTabletViewport
+        || usesDesktopCommerceSurface;
     const usesContainedModal = usesTabletViewport
         || (supportsDesktopHover && window.matchMedia("(min-width: 1181px)").matches);
+    const usesDesktopModalSurface = usesDesktopCommerceSurface;
+    const usesJoinedModalPurchaseControls = usesCompactViewport
+        || usesTabletViewport
+        || usesDesktopModalSurface;
+    const usesGraphiteModalSurface = usesGraphiteCommerceSurface || usesDesktopModalSurface;
+    const touchActionGraphite = "#4A4A4A";
+    const desktopActionGraphite = "#686868";
     const productButtonHoverStyle = supportsDesktopHover
         ? { "background-color": "#FFC300", "color": "#1A1A1A" }
         : { "background-color": "#363636", "color": "#FFFFFF" };
+    const touchCartToggleStyle = {
+        "background-color": "rgba(28, 28, 28, 0.68)",
+        "outline": "none",
+        "box-shadow": "none",
+    };
+    const graphiteCommerceSurfaceStyle = usesGraphiteCommerceSurface ? {
+        "background-color": "rgba(28, 28, 28, 0.68)",
+        "color": "#FFFFFF",
+        "backdrop-filter": "blur(14px)",
+        "-webkit-backdrop-filter": "blur(14px)",
+    } : {};
+    const graphiteModalSurfaceStyle = usesGraphiteModalSurface ? {
+        "background-color": "rgba(28, 28, 28, 0.68)",
+        "color": "#FFFFFF",
+        "backdrop-filter": "blur(14px)",
+        "-webkit-backdrop-filter": "blur(14px)",
+    } : {};
+    const mustardTouchActionStyle = usesGraphiteCommerceSurface ? {
+        "background-color": "#FFC300",
+        "color": "#1A1A1A",
+    } : {};
+    const mustardTouchActionHoverStyle = {
+        "background-color": "#D6A400",
+        "color": "#1A1A1A",
+    };
     const productButtonLayoutStyle = usesCompactViewport
         ? { "display": "block", "margin-left": "auto", "margin-right": "auto" }
         : usesTabletViewport
             ? {
                 "display": "block",
-                "font-size": "14px",
-                "min-width": "160px",
-                "min-height": "48px",
+                "font-size": usesIPadMiniViewport || usesIPadProViewport ? "16px" : "14px",
+                "min-width": usesIPadMiniViewport || usesIPadProViewport ? "200px" : "160px",
+                "min-height": usesIPadMiniViewport || usesIPadProViewport ? "54px" : "48px",
                 "margin-left": "auto",
                 "margin-right": "auto",
-                "padding": "13px 28px",
+                "padding": usesIPadMiniViewport || usesIPadProViewport ? "15px 34px" : "13px 28px",
             }
             : {};
     const modalImageStyle = usesCompactViewport
@@ -658,20 +748,31 @@ function componentOptions(product, signaturePresentation = null) {
     const modalCarouselStyle = usesCompactViewport
         ? { "min-height": "64px", "margin-top": "10px" }
         : {};
-    const modalCarouselControlStyle = usesCompactViewport
+    const modalCarouselControlStyle = usesGraphiteModalSurface
         ? {
-            "top": "50%",
-            "width": "44px",
-            "height": "44px",
-            "padding": "0",
-            "border": "0",
-            "border-radius": "0",
-            "background-color": "transparent",
-            "box-shadow": "none",
-            "color": "#363636",
-            "font-size": "0",
-            "line-height": "0",
-            "opacity": "1",
+            ...(usesCompactViewport ? {
+                "top": "50%",
+                "width": "44px",
+                "height": "44px",
+                "padding": "0",
+                "border": "0",
+                "border-radius": "0",
+                "background-color": "transparent",
+                "box-shadow": "none",
+                "font-size": "0",
+                "line-height": "0",
+                "opacity": "1",
+            } : {}),
+            ...(usesIPadProViewport ? {
+                "width": "52px",
+                "height": "52px",
+                "padding": "12px",
+                "font-size": "28px",
+                "line-height": "1",
+                "opacity": "1",
+            } : {}),
+            "color": "#FFFFFF",
+            "filter": "invert(1)",
         }
         : {};
     const modalCloseStyle = {
@@ -679,7 +780,9 @@ function componentOptions(product, signaturePresentation = null) {
         "align-items": "center",
         "justify-content": "center",
         "box-sizing": "border-box",
-        "border": "0",
+        "border": usesGraphiteModalSurface
+            ? "1px solid rgba(255, 255, 255, 0.22)"
+            : "0",
         "border-radius": "50%",
         "outline": "none",
         "background-color": "#4A4A4A",
@@ -687,18 +790,20 @@ function componentOptions(product, signaturePresentation = null) {
         "background-position": "center",
         "background-repeat": "no-repeat",
         "background-size": "10px 10px",
-        "box-shadow": "none",
+        "box-shadow": usesGraphiteModalSurface
+            ? "0 6px 16px rgba(0, 0, 0, 0.38), inset 0 0 0 1px rgba(255, 255, 255, 0.04)"
+            : "none",
         "color": "#FFFFFF",
         "font-size": "0",
         "font-weight": "400",
         "line-height": "0",
         "text-align": "center",
         ":hover": {
-            "background-color": "#565656",
+            "background-color": usesGraphiteModalSurface ? "#525252" : "#565656",
         },
         ":focus": {
             "outline": "none",
-            "background-color": "#5A5A5A",
+            "background-color": usesGraphiteModalSurface ? "#565656" : "#5A5A5A",
         },
     };
 
@@ -728,7 +833,7 @@ function componentOptions(product, signaturePresentation = null) {
                     "text-align": "center",
                 },
                 button: {
-                    "background-color": "#363636",
+                    "background-color": usesTouchStoreActions ? touchActionGraphite : desktopActionGraphite,
                     "border-radius": "999px",
                     "font-family": "Inter, sans-serif",
                     "font-size": "12px",
@@ -737,6 +842,11 @@ function componentOptions(product, signaturePresentation = null) {
                     "min-height": "38px",
                     "padding": "10px 18px",
                     ...productButtonLayoutStyle,
+                    ...(supportsDesktopHover && window.matchMedia("(min-width: 769px)").matches ? {
+                        "min-height": usesTabletViewport ? "46px" : "36px",
+                        "min-width": usesTabletViewport ? "156px" : "0",
+                        "padding": usesTabletViewport ? "12px 26px" : "9px 16px",
+                    } : {}),
                     ":hover": productButtonHoverStyle,
                     ":focus": { "background-color": "#4a4a4a" },
                 },
@@ -789,13 +899,15 @@ function componentOptions(product, signaturePresentation = null) {
                     "font-size": usesCompactViewport ? "22px" : "26px",
                     "font-weight": "400",
                     "line-height": "1.2",
-                    ...(usesContainedModal ? { "color": "#242424" } : {}),
+                    ...(usesGraphiteModalSurface
+                        ? { "color": "#FFFFFF" }
+                        : usesContainedModal ? { "color": "#242424" } : {}),
                 },
                 compareAt: {
                     "display": "none",
                 },
                 price: {
-                    "color": "#242424",
+                    "color": usesGraphiteModalSurface ? "#FFFFFF" : "#242424",
                     "font-family": "Inter, sans-serif",
                     "font-size": usesCompactViewport ? "22px" : "26px",
                     "font-variant-numeric": "tabular-nums",
@@ -809,28 +921,88 @@ function componentOptions(product, signaturePresentation = null) {
                     "overflow-y": "auto",
                     "font-size": "13px",
                     "line-height": "1.5",
-                    ...(usesContainedModal ? { "color": "#363636" } : {}),
+                    ...(usesGraphiteModalSurface
+                        ? { "color": "rgba(255, 255, 255, 0.82)" }
+                        : usesContainedModal ? { "color": "#363636" } : {}),
                 },
+                options: usesGraphiteModalSurface ? {
+                    "color": "rgba(255, 255, 255, 0.88)",
+                } : {},
+                select: usesGraphiteModalSurface ? {
+                    "background-color": "rgba(255, 255, 255, 0.96)",
+                    "color": "#1A1A1A",
+                } : {},
+                buttonWithQuantity: usesJoinedModalPurchaseControls ? {
+                    "display": "grid",
+                    "grid-template-columns": "3.5rem minmax(8.5rem, 1fr)",
+                    "align-items": "stretch",
+                    "width": usesDesktopModalSurface
+                        ? "min(100%, 15rem)"
+                        : "min(100%, 14rem)",
+                    "margin": "20px 0 0",
+                } : {},
+                quantity: usesJoinedModalPurchaseControls ? {
+                    "display": "block",
+                    "width": "100%",
+                    "height": "42px",
+                    "margin": "0",
+                } : {},
+                quantityInput: usesJoinedModalPurchaseControls ? {
+                    "box-sizing": "border-box",
+                    "display": "block",
+                    "width": "100%",
+                    "height": "42px",
+                    "margin": "0",
+                    "padding": "0 16px",
+                    "border": "0",
+                    "border-radius": "999px 0 0 999px",
+                    "background-color": "#FFFFFF",
+                    "color": "#1A1A1A",
+                    "font-family": "Inter, sans-serif",
+                    "font-size": "14px",
+                    "text-align": "center",
+                } : {},
+                buttonWrapper: usesJoinedModalPurchaseControls ? {
+                    "display": "block",
+                    "width": "100%",
+                    "height": "42px",
+                    "margin": "0",
+                } : {},
                 button: {
-                    ...(usesDesktopNavigation ? {
-                        "background-color": "#363636",
-                        "color": "#FFFFFF",
+                    ...(usesDesktopNavigation && !usesTabletViewport ? {
+                        "background-color": usesGraphiteModalSurface ? "#FFC300" : "#363636",
+                        "color": usesGraphiteModalSurface ? "#1A1A1A" : "#FFFFFF",
                         "font-size": "12px",
                         "letter-spacing": "0.02em",
                         "min-height": "38px",
                         "padding": "10px 18px",
                     } : {
                         "background-color": "#1a1a1a",
+                        ...mustardTouchActionStyle,
                     }),
-                    "border-radius": "999px",
+                    "box-sizing": "border-box",
+                    ...(usesJoinedModalPurchaseControls ? {
+                        "display": "block",
+                        "width": "100%",
+                        "height": "42px",
+                        "min-height": "42px",
+                        "padding": "0 16px",
+                        "border-radius": "0 999px 999px 0",
+                    } : {
+                        "border-radius": "999px",
+                    }),
                     "font-family": "Inter, sans-serif",
                     "font-weight": "700",
-                    ":hover": usesDesktopNavigation
-                        ? productButtonHoverStyle
-                        : { "background-color": "#8a6500" },
-                    ":focus": usesDesktopNavigation
-                        ? { "background-color": "#4a4a4a" }
-                        : { "background-color": "#8a6500" },
+                    ":hover": usesDesktopNavigation && !usesTabletViewport
+                        ? usesGraphiteModalSurface ? mustardTouchActionHoverStyle : productButtonHoverStyle
+                        : usesGraphiteCommerceSurface
+                            ? mustardTouchActionHoverStyle
+                            : { "background-color": "#8a6500" },
+                    ":focus": usesDesktopNavigation && !usesTabletViewport
+                        ? usesGraphiteModalSurface ? mustardTouchActionHoverStyle : { "background-color": "#4a4a4a" }
+                        : usesGraphiteCommerceSurface
+                            ? mustardTouchActionHoverStyle
+                            : { "background-color": "#8a6500" },
                 },
             },
         },
@@ -881,7 +1053,7 @@ function componentOptions(product, signaturePresentation = null) {
                     "box-shadow": "0 26px 70px rgba(0, 0, 0, 0.28)",
                     "@media (min-width: 500px)": {
                         "width": "calc(100% - 32px)",
-                        "max-width": "820px",
+                        "max-width": usesDesktopModalSurface ? "940px" : "820px",
                         "height": "auto",
                         "min-height": "auto",
                         "max-height": "calc(100% - 48px)",
@@ -891,14 +1063,16 @@ function componentOptions(product, signaturePresentation = null) {
                         "left": "auto",
                         "right": "auto",
                         "margin": "auto",
-                        "border": "1px solid rgba(54, 54, 54, 0.18)",
+                        "border": usesTouchStoreActions
+                            ? "0"
+                            : "1px solid rgba(54, 54, 54, 0.18)",
                         "border-radius": "12px",
                     },
                     // Buy Button emits base styles after media rules. Override the
                     // fullscreen base for the shared tablet and desktop panel.
                     ...(usesContainedModal ? {
                         "width": "calc(100% - 32px)",
-                        "max-width": "820px",
+                        "max-width": usesDesktopModalSurface ? "940px" : "820px",
                         "height": "auto",
                         "min-height": "0",
                         "max-height": "calc(100dvh - 48px)",
@@ -908,13 +1082,16 @@ function componentOptions(product, signaturePresentation = null) {
                         "left": "auto",
                         "right": "auto",
                         "margin": "auto",
-                        "border": "1px solid rgba(255, 255, 255, 0.65)",
+                        "border": usesGraphiteModalSurface
+                            ? "0"
+                            : "1px solid rgba(255, 255, 255, 0.65)",
                         "border-radius": "12px",
                         "background-color": "rgba(255, 253, 247, 0.90)",
                         "color": "#363636",
                         "backdrop-filter": "blur(12px)",
                         "-webkit-backdrop-filter": "blur(12px)",
                     } : {}),
+                    ...graphiteModalSurfaceStyle,
                 },
                 close: {
                     "position": "fixed",
@@ -942,6 +1119,9 @@ function componentOptions(product, signaturePresentation = null) {
         },
         cart: {
             popup: false,
+            events: usesGraphiteCommerceSurface ? {
+                afterRender: enhanceCartTypography,
+            } : {},
             DOMEvents: {
                 "click .cbs-buy-cart__remove": removeCartLine,
             },
@@ -950,13 +1130,87 @@ function componentOptions(product, signaturePresentation = null) {
                 button: "Checkout",
             },
             styles: {
+                cart: {
+                    ...graphiteCommerceSurfaceStyle,
+                },
+                header: usesGraphiteCommerceSurface ? {
+                    "background-color": "transparent",
+                    "color": "#FFFFFF",
+                } : {},
+                title: usesGraphiteCommerceSurface ? {
+                    "color": "#FFFFFF",
+                } : {},
+                lineItems: usesGraphiteCommerceSurface ? {
+                    "color": "rgba(255, 255, 255, 0.88)",
+                } : {},
+                footer: usesGraphiteCommerceSurface ? {
+                    "background-color": "transparent",
+                } : {},
+                subtotalText: usesGraphiteCommerceSurface ? {
+                    "color": "rgba(255, 255, 255, 0.82)",
+                } : {},
+                subtotal: usesGraphiteCommerceSurface ? {
+                    "color": "#FFFFFF",
+                    "font-family": "Inter, sans-serif",
+                    "font-variant-numeric": "tabular-nums",
+                    "font-weight": "600",
+                    "letter-spacing": "-0.02em",
+                } : {},
+                notice: usesGraphiteCommerceSurface ? {
+                    "color": "rgba(255, 255, 255, 0.72)",
+                } : {},
+                close: {
+                    "position": "fixed",
+                    "top": "calc(8px + env(safe-area-inset-top))",
+                    "right": "calc(8px + env(safe-area-inset-right))",
+                    "width": "36px",
+                    "height": "36px",
+                    "font-size": "36px",
+                    "line-height": "40px",
+                    "padding": "0",
+                    "color": "#363636",
+                    ...modalCloseStyle,
+                    "@media (min-width: 500px)": {
+                        "position": "absolute",
+                        "top": "8px",
+                        "right": "8px",
+                    },
+                    ...(usesContainedModal ? {
+                        "position": "absolute",
+                        "top": "8px",
+                        "right": "8px",
+                    } : {}),
+                },
                 button: {
-                    "background-color": "#1a1a1a",
+                    ...(usesDesktopNavigation ? {
+                        "background-color": usesGraphiteCommerceSurface ? "#FFC300" : "#1a1a1a",
+                        "color": usesGraphiteCommerceSurface ? "#1A1A1A" : "#FFFFFF",
+                    } : {
+                        "background-color": "#363636",
+                        "color": "#FFFFFF",
+                        ...mustardTouchActionStyle,
+                        "font-size": usesTabletViewport ? "14px" : "12px",
+                        "letter-spacing": "0.02em",
+                        "min-height": usesTabletViewport ? "48px" : "38px",
+                        "padding": usesTabletViewport ? "13px 28px" : "10px 18px",
+                    }),
                     "border-radius": "999px",
                     "font-family": "Inter, sans-serif",
                     "font-weight": "700",
-                    ":hover": { "background-color": "#8a6500" },
-                    ":focus": { "background-color": "#8a6500" },
+                    ":hover": usesDesktopNavigation
+                        ? usesGraphiteCommerceSurface
+                            ? mustardTouchActionHoverStyle
+                            : { "background-color": "#8a6500" }
+                        : usesGraphiteCommerceSurface
+                            ? mustardTouchActionHoverStyle
+                            : productButtonHoverStyle,
+                    ":focus": usesDesktopNavigation
+                        ? usesGraphiteCommerceSurface
+                            ? mustardTouchActionHoverStyle
+                            : { "background-color": "#8a6500" }
+                        : usesGraphiteCommerceSurface
+                            ? mustardTouchActionHoverStyle
+                            : { "background-color": "#4a4a4a" },
                 },
             },
         },
@@ -969,6 +1223,19 @@ function componentOptions(product, signaturePresentation = null) {
                 remove: "cbs-buy-cart__remove",
             },
             styles: {
+                title: usesGraphiteCommerceSurface ? {
+                    "color": "#FFFFFF",
+                } : {},
+                variantTitle: usesGraphiteCommerceSurface ? {
+                    "color": "rgba(255, 255, 255, 0.78)",
+                } : {},
+                price: usesGraphiteCommerceSurface ? {
+                    "color": "#FFFFFF",
+                    "font-family": "Inter, sans-serif",
+                    "font-variant-numeric": "tabular-nums",
+                    "font-weight": "600",
+                    "letter-spacing": "-0.02em",
+                } : {},
                 controls: {
                     "display": "flex",
                     "align-items": "center",
@@ -982,6 +1249,16 @@ function componentOptions(product, signaturePresentation = null) {
                     "margin-left": "0",
                     "margin-right": "0",
                 },
+                quantityButton: usesGraphiteCommerceSurface ? {
+                    "background-color": "rgba(255, 255, 255, 0.96)",
+                    "border-color": "rgba(255, 255, 255, 0.72)",
+                    "color": "#1A1A1A",
+                } : {},
+                quantityInput: usesGraphiteCommerceSurface ? {
+                    "background-color": "rgba(255, 255, 255, 0.96)",
+                    "border-color": "rgba(255, 255, 255, 0.72)",
+                    "color": "#1A1A1A",
+                } : {},
                 remove: {
                     "display": "inline-flex",
                     "align-items": "center",
@@ -995,11 +1272,13 @@ function componentOptions(product, signaturePresentation = null) {
                     "border": "0",
                     "border-radius": "50%",
                     "background-color": "transparent",
-                    "color": "#4c4c4c",
+                    "color": usesGraphiteCommerceSurface ? "#FFFFFF" : "#4c4c4c",
                     "cursor": "pointer",
                     ":hover": {
-                        "background-color": "rgba(54, 54, 54, 0.08)",
-                        "color": "#1a1a1a",
+                        "background-color": usesGraphiteCommerceSurface
+                            ? "rgba(255, 255, 255, 0.10)"
+                            : "rgba(54, 54, 54, 0.08)",
+                        "color": usesGraphiteCommerceSurface ? "#FFFFFF" : "#1a1a1a",
                     },
                     ":focus": {
                         "outline": "2px solid #FFC300",
@@ -1026,14 +1305,32 @@ function componentOptions(product, signaturePresentation = null) {
                         "box-shadow": "none",
                         "color": "#FFFFFF",
                     } : {
-                        "background-color": "#1a1a1a",
+                        ...touchCartToggleStyle,
+                        "backdrop-filter": "blur(14px)",
+                        "-webkit-backdrop-filter": "blur(14px)",
+                        "border": "0",
+                        ...(usesCompactViewport
+                            ? {
+                                "min-width": "44px",
+                                "padding": "6px 8px",
+                                "font-size": "13px",
+                            }
+                            : usesTabletViewport ? {
+                                "min-width": "76px",
+                                "min-height": "68px",
+                                "padding": "16px 20px",
+                                "font-size": "18px",
+                            } : {}),
                     }),
                     ":hover": usesDesktopNavigation
                         ? { "background-color": "transparent", "color": "#FFC300" }
-                        : { "background-color": "#8a6500" },
+                        : touchCartToggleStyle,
                     ":focus": usesDesktopNavigation
                         ? { "background-color": "transparent", "color": "#FFC300" }
-                        : { "background-color": "#8a6500" },
+                        : touchCartToggleStyle,
+                    ":active": usesDesktopNavigation
+                        ? { "background-color": "transparent", "color": "#FFC300" }
+                        : touchCartToggleStyle,
                 },
                 count: usesDesktopNavigation ? {
                     "margin-right": "0",
@@ -1041,6 +1338,12 @@ function componentOptions(product, signaturePresentation = null) {
                     "font-size": "12px",
                     "font-weight": "600",
                     "line-height": "1",
+                } : usesCompactViewport ? {
+                    "font-size": "13px",
+                    "font-weight": "600",
+                } : usesTabletViewport ? {
+                    "font-size": "18px",
+                    "font-weight": "700",
                 } : {},
             },
         },
