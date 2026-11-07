@@ -1,4 +1,5 @@
 import { SHOPIFY_CONFIG } from "./config.js";
+import { enhanceModalOptionSelectors } from "./modal-option-selectors.js";
 
 let sdkPromise = null;
 let client = null;
@@ -187,6 +188,7 @@ function enhanceModalTypography(attempt = 0) {
     }
 
     formatModalTypography(modalDocument);
+    enhanceModalOptionSelectors(modalDocument);
 
     if (modalDocument.documentElement.dataset.cbsTypographyObserver === "true") {
         return;
